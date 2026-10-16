@@ -1,0 +1,589 @@
+{
+  "version": 1,
+  "generado": "2026-10-16",
+  "origen": "Continuidades_calidad_2024-2030.xlsx",
+  "meses": {
+    "2024-08": {
+      "rafa": {
+        "dias": [
+          2,
+          12,
+          13,
+          19,
+          30
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          6,
+          13,
+          20,
+          27
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2024-09": {
+      "rafa": {
+        "dias": [
+          16,
+          17,
+          24
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          16,
+          17,
+          23,
+          24
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2024-10": {
+      "rafa": {
+        "dias": [
+          16,
+          21,
+          30
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          1,
+          8,
+          15,
+          22
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2024-11": {
+      "rafa": {
+        "dias": [
+          5,
+          15,
+          20
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          5,
+          12,
+          19,
+          26
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2024-12": {
+      "rafa": {
+        "dias": [
+          11,
+          19,
+          30,
+          31
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          3,
+          11,
+          17,
+          19
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-01": {
+      "rafa": {
+        "dias": [
+          3,
+          8,
+          14,
+          23
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          3,
+          8,
+          14,
+          22
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-02": {
+      "rafa": {
+        "dias": [
+          4,
+          18
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          4,
+          11,
+          18,
+          25
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-03": {
+      "rafa": {
+        "dias": [
+          4,
+          11,
+          25
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          4,
+          11,
+          18,
+          25
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-04": {
+      "rafa": {
+        "dias": [
+          8,
+          14,
+          15,
+          29
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          1,
+          8,
+          15,
+          22
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-05": {
+      "rafa": {
+        "dias": [
+          14,
+          20
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          6,
+          13,
+          20,
+          27
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-06": {
+      "rafa": {
+        "dias": [
+          3,
+          17
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          3,
+          10,
+          17,
+          24
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-07": {
+      "rafa": {
+        "dias": [
+          8
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          3,
+          8,
+          15,
+          22
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-08": {
+      "rafa": {
+        "dias": [],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          1,
+          5,
+          7,
+          12
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-09": {
+      "rafa": {
+        "dias": [
+          30
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          19,
+          23,
+          25,
+          30
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-10": {
+      "rafa": {
+        "dias": [
+          7,
+          21,
+          28
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          7,
+          15,
+          21,
+          28
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-11": {
+      "rafa": {
+        "dias": [
+          11,
+          25
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          4,
+          13,
+          18,
+          25
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2025-12": {
+      "rafa": {
+        "dias": [
+          2,
+          16,
+          23,
+          30
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          2,
+          16,
+          23,
+          30
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-01": {
+      "rafa": {
+        "dias": [
+          13,
+          20,
+          27
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          13,
+          14,
+          20,
+          27
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-02": {
+      "rafa": {
+        "dias": [
+          3,
+          17,
+          24
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          3,
+          10,
+          17,
+          24
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-03": {
+      "rafa": {
+        "dias": [
+          10,
+          12,
+          31
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          3,
+          10,
+          17,
+          24
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-04": {
+      "rafa": {
+        "dias": [
+          15,
+          21,
+          22,
+          27
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          15,
+          21,
+          22,
+          27
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-05": {
+      "rafa": {
+        "dias": [
+          5,
+          6,
+          19
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          5,
+          12,
+          19,
+          26
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-06": {
+      "rafa": {
+        "dias": [
+          2,
+          9
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          2,
+          9,
+          16,
+          23
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-07": {
+      "rafa": {
+        "dias": [
+          8,
+          9,
+          15
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          2,
+          7,
+          15,
+          23
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-08": {
+      "rafa": {
+        "dias": [
+          4,
+          5,
+          17,
+          21,
+          31
+        ],
+        "ausencia": null,
+        "abonado": true
+      },
+      "carlos": {
+        "dias": [
+          4,
+          11,
+          18,
+          25
+        ],
+        "ausencia": null,
+        "abonado": true
+      }
+    },
+    "2026-09": {
+      "rafa": {
+        "dias": [
+          2,
+          15
+        ],
+        "ausencia": null,
+        "abonado": false
+      },
+      "carlos": {
+        "dias": [
+          24,
+          25,
+          28,
+          30
+        ],
+        "ausencia": null,
+        "abonado": false
+      }
+    },
+    "2026-10": {
+      "rafa": {
+        "dias": [
+          27
+        ],
+        "ausencia": null,
+        "abonado": false
+      },
+      "carlos": {
+        "dias": [
+          6,
+          13,
+          20,
+          27
+        ],
+        "ausencia": null,
+        "abonado": false
+      }
+    },
+    "2026-11": {
+      "rafa": {
+        "dias": [
+          3,
+          6,
+          16,
+          17
+        ],
+        "ausencia": null,
+        "abonado": false
+      },
+      "carlos": {
+        "dias": [
+          4,
+          10,
+          17,
+          24
+        ],
+        "ausencia": null,
+        "abonado": false
+      }
+    }
+  }
+}
