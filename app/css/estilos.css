@@ -262,3 +262,5 @@ details.plegable[open] > summary::after { transform: rotate(90deg); }
 details.plegable > summary small { font-weight: 400; opacity: .8; font-size: .78rem; }
 details.guia { margin-top: 12px; border-top: 1px solid var(--borde); padding-top: 10px; }
 details.guia > summary { cursor: pointer; color: var(--marino); font-weight: 600; margin-bottom: 8px; }
+.botones-informe { margin: 0 0 6px; }
+@media print { .botones { display: none !important; } }

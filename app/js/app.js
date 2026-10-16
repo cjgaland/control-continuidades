@@ -4,16 +4,16 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS,
-} from './calculo.js?v=1.2';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.2';
+} from './calculo.js?v=1.3';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.3';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.2';
+} from './github.js?v=1.3';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.2';
-import { crearPdf } from './pdf.js?v=1.2';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.2';
+} from './escrito.js?v=1.3';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=1.3';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.3';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -198,8 +198,14 @@ function vistaInforme() {
     <div class="barra">
       <label for="sel-anio-i">Año</label>
       <select id="sel-anio-i">${opcionesAnio(anio, false)}</select>
-      <button class="boton" id="btn-imprimir" type="button">Imprimir</button>
     </div>
+    <div class="botones botones-informe solo-pantalla">
+      ${puedeCompartirArchivos()
+    ? '<button class="boton" id="btn-inf-compartir" type="button">Ver / compartir PDF</button>'
+    : '<button class="boton" id="btn-inf-ver" type="button">Ver PDF</button>'}
+      <button class="boton secundario" id="btn-inf-descargar" type="button">Descargar PDF</button>
+    </div>
+    <p id="inf-aviso" class="aviso solo-pantalla" role="status"></p>
     <div class="informe">
       <p class="titulo">Continuidades Extras Área de Calidad · ${anio}</p>
       <p class="subtitulo">Hospital Comarcal de Montilla · Área de Gestión Sanitaria Sur de Córdoba · a ${hoyTxt}</p>
@@ -219,6 +225,108 @@ function vistaInforme() {
         ${Object.keys(PERSONAS).map((p) => tablaPersona(p, anio)).join('')}
       </div>
     </div>`;
+}
+
+// PDF del informe: mismos datos que la pantalla, en A4 apaisado.
+function datosPdfInforme(anio) {
+  const d = estado.datos;
+  const ps = Object.keys(PERSONAS);
+  const txt = (n) => (n > 0 ? String(n) : n < 0 ? `+${-n}` : '0');
+  const filasTotales = [];
+  if (anio - 1 >= partirClave(INICIO).anio) {
+    filasTotales.push([`Débito anual ${anio - 1}`, ...ps.map((p) => txt(debitoAnual(d, anio - 1, p, estado.hoy)))]);
+  }
+  filasTotales.push([`Débito anual ${anio}`, ...ps.map((p) => txt(debitoAnual(d, anio, p, estado.hoy)))]);
+  filasTotales.push(['Acumulado total (desde ago 2024)', ...ps.map((p) => txt(acumuladoTotal(d, claveMes(anio, 12), p, estado.hoy)))]);
+  filasTotales.push(['Abonado hasta', ...ps.map((p) => {
+    const c = abonadoHasta(d, p);
+    return c ? `${ABREV_MES[partirClave(c).mes - 1]} ${partirClave(c).anio}` : '—';
+  })]);
+
+  const personas = ps.map((p) => {
+    const filas = [];
+    for (let m = 1; m <= 12; m++) {
+      const clave = claveMes(anio, m);
+      const reg = registro(d, clave, p);
+      if (clave < INICIO) { filas.push([NOMBRES_MES[m - 1], '', '', '', '', '']); continue; }
+      const dias = reg.ausencia ? textoAusencia(reg.ausencia) : reg.dias.map((x) => `${x} ${abrevSemana(anio, m, x)}`).join(' · ');
+      filas.push([
+        NOMBRES_MES[m - 1], dias, reg.ausencia ? '' : String(reg.dias.length),
+        txt(debitoMensual(d, clave, p, estado.hoy)), txt(acumuladoAnio(d, clave, p, estado.hoy)), reg.abonado ? 'Sí' : '',
+      ]);
+    }
+    return { nombre: PERSONAS[p].completo, filas, pie: `Débito anual ${anio}: ${txt(debitoAnual(d, anio, p, estado.hoy))}` };
+  });
+
+  const hoy = estado.hoy;
+  const hoyTxt = hoy.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  const fecha = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+  return {
+    nombre: `${fecha}_Informe_${anio}.pdf`,
+    informe: {
+      titulo: `Continuidades Extras Área de Calidad · ${anio}`,
+      subtitulo: `Hospital Comarcal de Montilla · Área de Gestión Sanitaria Sur de Córdoba · a ${hoyTxt}`,
+      totales: { cabecera: ['', ...ps.map((p) => PERSONAS[p].nombre)], filas: filasTotales },
+      personas,
+      pieDePagina: `Control de Continuidades v${VERSION} · ${AUTOR} · Débito: positivo = se debe; + = hechas de más`,
+    },
+  };
+}
+
+function avisoInforme(texto, error = false) {
+  const el = document.getElementById('inf-aviso');
+  if (!el) return;
+  el.textContent = texto;
+  el.classList.toggle('error', error);
+}
+
+async function pdfInforme() {
+  const anio = Number(estado.anioInforme ?? partirClave(claveDeHoy(estado.hoy)).anio);
+  const { nombre, informe } = datosPdfInforme(anio);
+  return { blob: await crearPdfInforme(informe), nombre };
+}
+
+async function verPdfInforme() {
+  // La ventana se abre antes de generar el PDF para que el navegador no la bloquee.
+  const ventana = window.open('', '_blank');
+  avisoInforme('Preparando el PDF…');
+  try {
+    const { blob } = await pdfInforme();
+    const url = URL.createObjectURL(blob);
+    if (ventana) ventana.location.href = url;
+    else location.href = url;
+    avisoInforme('PDF abierto en otra pestaña. Desde ahí puedes imprimirlo o guardarlo.');
+  } catch (err) {
+    ventana?.close();
+    avisoInforme(err.message, true);
+  }
+}
+
+async function descargarPdfInforme() {
+  avisoInforme('Preparando el PDF…');
+  try {
+    const { blob, nombre } = await pdfInforme();
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: nombre });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    avisoInforme(`Descargado: ${nombre}`);
+  } catch (err) {
+    avisoInforme(err.message, true);
+  }
+}
+
+async function compartirPdfInforme() {
+  avisoInforme('Preparando el PDF…');
+  try {
+    const { blob, nombre } = await pdfInforme();
+    await navigator.share({ files: [new File([blob], nombre, { type: 'application/pdf' })], title: nombre });
+    avisoInforme('');
+  } catch (err) {
+    avisoInforme(err.name === 'AbortError' ? '' : err.message, err.name !== 'AbortError');
+  }
 }
 
 // ---------- Escrito ----------
@@ -632,7 +740,7 @@ function vistaAyuda() {
       <ul>
         <li><b>Resumen</b>: débito del mes, acumulado del año, débito anual, acumulado total y hasta qué mes se ha abonado.</li>
         <li><b>Histórico</b>: todos los meses desde agosto de 2024, con filtro por año. ✓ = abonado.</li>
-        <li><b>Informe</b>: el año en formato parecido a la hoja del Excel. Botón «Imprimir» (también sirve para guardar en PDF).</li>
+        <li><b>Informe</b>: el año en formato parecido a la hoja del Excel. «Ver PDF» lo abre para verlo o imprimirlo; «Descargar PDF» lo guarda (en el móvil, «Ver / compartir PDF» abre el menú Compartir, con Imprimir y Guardar en Drive).</li>
         <li><b>Escrito</b>: el texto para Gerencia, con «Copiar texto», «Abrir correo» y «Guardar PDF» (en el móvil, «Compartir PDF» para mandarlo a Drive).</li>
         <li><b>Editar</b> (solo Carlos, con su token): anotar los días del mes, vacaciones o baja del mes completo y «abonado».</li>
       </ul>
@@ -766,7 +874,9 @@ $contenido.addEventListener('change', (e) => {
 
 $contenido.addEventListener('click', (e) => {
   const acciones = {
-    'btn-imprimir': () => window.print(),
+    'btn-inf-ver': verPdfInforme,
+    'btn-inf-descargar': descargarPdfInforme,
+    'btn-inf-compartir': compartirPdfInforme,
     'btn-copiar': copiarTexto,
     'btn-correo': abrirCorreo,
     'btn-pdf': guardarPdf,

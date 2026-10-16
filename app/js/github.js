@@ -1,7 +1,7 @@
 // Lectura y guardado de datos/continuidades.json con la API de GitHub.
 // El token solo se guarda en el localStorage de este dispositivo.
 
-import { aBase64, deBase64, aJson } from './datos.js?v=1.2';
+import { aBase64, deBase64, aJson } from './datos.js?v=1.3';
 
 // Repositorio: se deduce de la dirección de GitHub Pages (usuario.github.io/repositorio/).
 // Si la app se abre desde otro sitio (por ejemplo, en local), se usan estos valores.
