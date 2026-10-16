@@ -3,17 +3,17 @@
 import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
-  resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS,
-} from './calculo.js?v=1.3';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.3';
+  resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS, resumenAnual,
+} from './calculo.js?v=1.4';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.4';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.3';
+} from './github.js?v=1.4';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.3';
-import { crearPdf, crearPdfInforme } from './pdf.js?v=1.3';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.3';
+} from './escrito.js?v=1.4';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=1.4';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.4';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -186,6 +186,33 @@ function tablaPersona(p, anio) {
     </table></div>`;
 }
 
+const ESTADOS_MES = {
+  abonado: 'Abonado', pendiente: 'Pendiente', prevision: 'Previsión', ausencia: 'Vacaciones o baja', vacio: 'Sin días', fuera: 'No contabiliza',
+};
+const INICIALES = ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+function bloqueResumenAnual(anio) {
+  const tarjetas = Object.keys(PERSONAS).map((p) => {
+    const r = resumenAnual(estado.datos, anio, p, estado.hoy);
+    const tira = r.estados.map((e, i) => `<span class="mes-tira est-${e}" title="${NOMBRES_MES[i]}: ${ESTADOS_MES[e]}">${INICIALES[i]}</span>`).join('');
+    return `
+      <div class="resumen-anual">
+        <h4>${PERSONAS[p].nombre} · ${anio}</h4>
+        <div class="cifras-anuales">
+          <div><b>${r.solicitados}</b><span>solicitados<br>de ${r.cupo} de cupo</span></div>
+          <div><b class="ok">${r.abonados}</b><span>meses<br>abonados</span></div>
+          <div><b class="${r.pendientes ? 'pend' : ''}">${r.pendientes}</b><span>meses pendientes${r.prevision ? `<br>(${r.prevision} previsión)` : '<br>de abono'}</span></div>
+        </div>
+        <div class="tira" aria-label="Estado de cada mes">${tira}</div>
+      </div>`;
+  }).join('');
+  const leyenda = ['abonado', 'pendiente', 'prevision', 'ausencia', 'vacio']
+    .map((e) => `<span><i class="mes-tira est-${e}"></i>${ESTADOS_MES[e]}</span>`).join('');
+  return `
+    <div class="informe-resumen">${tarjetas}</div>
+    <p class="leyenda-tira">${leyenda}</p>`;
+}
+
 function vistaInforme() {
   const anio = Number(estado.anioInforme ?? partirClave(claveDeHoy(estado.hoy)).anio);
   const d = estado.datos;
@@ -224,6 +251,7 @@ function vistaInforme() {
       <div class="informe-cuerpo">
         ${Object.keys(PERSONAS).map((p) => tablaPersona(p, anio)).join('')}
       </div>
+      ${bloqueResumenAnual(anio)}
     </div>`;
 }
 
@@ -255,7 +283,13 @@ function datosPdfInforme(anio) {
         txt(debitoMensual(d, clave, p, estado.hoy)), txt(acumuladoAnio(d, clave, p, estado.hoy)), reg.abonado ? 'Sí' : '',
       ]);
     }
-    return { nombre: PERSONAS[p].completo, filas, pie: `Débito anual ${anio}: ${txt(debitoAnual(d, anio, p, estado.hoy))}` };
+    return {
+      nombre: PERSONAS[p].completo,
+      corto: PERSONAS[p].nombre,
+      filas,
+      pie: `Débito anual ${anio}: ${txt(debitoAnual(d, anio, p, estado.hoy))}`,
+      resumen: resumenAnual(d, anio, p, estado.hoy),
+    };
   });
 
   const hoy = estado.hoy;
@@ -268,6 +302,7 @@ function datosPdfInforme(anio) {
       subtitulo: `Hospital Comarcal de Montilla · Área de Gestión Sanitaria Sur de Córdoba · a ${hoyTxt}`,
       totales: { cabecera: ['', ...ps.map((p) => PERSONAS[p].nombre)], filas: filasTotales },
       personas,
+      anio,
       pieDePagina: `Control de Continuidades v${VERSION} · ${AUTOR} · Débito: positivo = se debe; + = hechas de más`,
     },
   };
@@ -740,7 +775,7 @@ function vistaAyuda() {
       <ul>
         <li><b>Resumen</b>: débito del mes, acumulado del año, débito anual, acumulado total y hasta qué mes se ha abonado.</li>
         <li><b>Histórico</b>: todos los meses desde agosto de 2024, con filtro por año. ✓ = abonado.</li>
-        <li><b>Informe</b>: el año en formato parecido a la hoja del Excel. «Ver PDF» lo abre para verlo o imprimirlo; «Descargar PDF» lo guarda (en el móvil, «Ver / compartir PDF» abre el menú Compartir, con Imprimir y Guardar en Drive).</li>
+        <li><b>Informe</b>: el año en formato parecido a la hoja del Excel. «Ver PDF» lo abre para verlo o imprimirlo; «Descargar PDF» lo guarda (en el móvil, «Ver / compartir PDF» abre el menú Compartir, con Imprimir y Guardar en Drive). Debajo, el resumen del año: días solicitados frente al cupo, meses abonados y pendientes, y una tira de colores con el estado de cada mes.</li>
         <li><b>Escrito</b>: el texto para Gerencia, con «Copiar texto», «Abrir correo» y «Guardar PDF» (en el móvil, «Compartir PDF» para mandarlo a Drive).</li>
         <li><b>Editar</b> (solo Carlos, con su token): anotar los días del mes, vacaciones o baja del mes completo y «abonado».</li>
       </ul>

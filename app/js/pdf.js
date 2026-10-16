@@ -87,6 +87,77 @@ function colorDebito(celda) {
   else if (t.startsWith('+')) celda.cell.styles.textColor = VERDE;
 }
 
+const COLORES_ESTADO = {
+  abonado: { fondo: VERDE, texto: [255, 255, 255] },
+  pendiente: { fondo: [230, 149, 0], texto: [255, 255, 255] },
+  prevision: { fondo: [251, 227, 179], texto: [138, 83, 0] },
+  ausencia: { fondo: [109, 143, 199], texto: [255, 255, 255] },
+  vacio: { fondo: [214, 219, 227], texto: [107, 114, 128] },
+  fuera: { fondo: [255, 255, 255], texto: [192, 198, 208] },
+};
+const NOMBRES_ESTADO = { abonado: 'Abonado', pendiente: 'Pendiente', prevision: 'Previsión', ausencia: 'Vacaciones o baja', vacio: 'Sin días' };
+const INICIALES = ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+function dibujarResumen(doc, p, anio, x, y, ancho) {
+  const r = p.resumen;
+  doc.setFillColor(...CLARO_2);
+  doc.setDrawColor(201, 211, 230);
+  doc.roundedRect(x, y, ancho, 32, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...MARINO);
+  doc.text(`${p.corto} · ${anio}`, x + 3, y + 5);
+
+  const cifras = [
+    { n: String(r.solicitados), t: `solicitados de ${r.cupo} de cupo`, color: MARINO },
+    { n: String(r.abonados), t: 'meses abonados', color: VERDE },
+    { n: String(r.pendientes), t: r.prevision ? `pendientes (${r.prevision} previsión)` : 'meses pendientes', color: r.pendientes ? [178, 106, 0] : MARINO },
+  ];
+  const anchoCifra = (ancho - 6 - 4) / 3;
+  cifras.forEach((c, i) => {
+    const cx = x + 3 + i * (anchoCifra + 2);
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(cx, y + 7, anchoCifra, 12, 1.5, 1.5, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...c.color);
+    doc.text(c.n, cx + anchoCifra / 2, y + 12.5, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(107, 114, 128);
+    doc.text(c.t, cx + anchoCifra / 2, y + 16.8, { align: 'center' });
+  });
+
+  const anchoMes = (ancho - 6 - 11 * 1) / 12;
+  r.estados.forEach((e, i) => {
+    const mx = x + 3 + i * (anchoMes + 1);
+    const col = COLORES_ESTADO[e];
+    doc.setFillColor(...col.fondo);
+    doc.setDrawColor(e === 'fuera' || e === 'prevision' ? 214 : 255, e === 'fuera' || e === 'prevision' ? 180 : 255, e === 'fuera' || e === 'prevision' ? 120 : 255);
+    doc.roundedRect(mx, y + 22, anchoMes, 7, 1, 1, e === 'fuera' || e === 'prevision' ? 'FD' : 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(...col.texto);
+    doc.text(INICIALES[i], mx + anchoMes / 2, y + 26.6, { align: 'center' });
+  });
+}
+
+function dibujarLeyenda(doc, centro, y) {
+  const elementos = Object.entries(NOMBRES_ESTADO);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  const anchos = elementos.map(([, t]) => 5 + doc.getTextWidth(t) + 6);
+  let x = centro - anchos.reduce((a, b) => a + b, 0) / 2;
+  elementos.forEach(([e, t], i) => {
+    const col = COLORES_ESTADO[e];
+    doc.setFillColor(...col.fondo);
+    doc.roundedRect(x, y - 2.8, 3.5, 3.5, 0.6, 0.6, 'F');
+    doc.setTextColor(107, 114, 128);
+    doc.text(t, x + 5, y);
+    x += anchos[i];
+  });
+}
+
 // informe: { titulo, subtitulo, totales: { cabecera: [...], filas: [[...]] },
 //            personas: [{ nombre, filas: [[mes, dias, total, debito, acumulado, abonado]], pie: 'Débito anual 2026: 22' }],
 //            pieDePagina: '...' }
@@ -124,6 +195,7 @@ export async function crearPdfInforme(informe) {
 
   const inicioTablas = doc.lastAutoTable.finalY + 5;
   const anchoTabla = (ancho - 2 * margen - 6) / 2;
+  let finTablas = inicioTablas;
   informe.personas.forEach((p, i) => {
     doc.autoTable({
       ...estiloBase,
@@ -148,7 +220,15 @@ export async function crearPdfInforme(informe) {
         if (c.section === 'body' && c.column.index === 5 && c.cell.raw === 'Sí') c.cell.styles.textColor = VERDE;
       },
     });
+    finTablas = Math.max(finTablas, doc.lastAutoTable.finalY);
   });
+
+  // Resumen del año: cifras y una tira con el estado de cada mes.
+  const yRes = finTablas + 5;
+  informe.personas.forEach((p, i) => {
+    dibujarResumen(doc, p, informe.anio, margen + i * (anchoTabla + 6), yRes, anchoTabla);
+  });
+  dibujarLeyenda(doc, ancho / 2, yRes + 37);
 
   doc.setFontSize(7.5);
   doc.setTextColor(154, 161, 173);

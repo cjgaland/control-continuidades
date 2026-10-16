@@ -264,3 +264,27 @@ details.guia { margin-top: 12px; border-top: 1px solid var(--borde); padding-top
 details.guia > summary { cursor: pointer; color: var(--marino); font-weight: 600; margin-bottom: 8px; }
 .botones-informe { margin: 0 0 6px; }
 @media print { .botones { display: none !important; } }
+
+/* ---------- Informe: resumen del año ---------- */
+.informe-resumen { display: grid; gap: 12px; margin-top: 16px; }
+@media (min-width: 760px) { .informe-resumen { grid-template-columns: 1fr 1fr; gap: 16px; } }
+.resumen-anual { border: 1px solid var(--borde); border-radius: var(--radio); padding: 10px 12px; background: var(--claro-2); }
+.resumen-anual h4 { margin: 0 0 8px; color: var(--marino); font-size: .95rem; }
+.cifras-anuales { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.cifras-anuales div { background: var(--blanco); border-radius: 8px; padding: 6px 4px; }
+.cifras-anuales b { display: block; font-size: 1.5rem; color: var(--marino); line-height: 1.2; }
+.cifras-anuales b.ok { color: var(--verde); }
+.cifras-anuales b.pend { color: #b26a00; }
+.cifras-anuales span { font-size: .72rem; color: var(--gris); }
+.tira { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; margin-top: 10px; }
+.mes-tira { display: inline-flex; align-items: center; justify-content: center; height: 24px; border-radius: 5px; font-size: .7rem; font-weight: 700; color: #fff; }
+.mes-tira.est-abonado { background: var(--verde); }
+.mes-tira.est-pendiente { background: #e69500; }
+.mes-tira.est-prevision { background: #fbe3b3; color: #8a5300; border: 1px dashed #e69500; }
+.mes-tira.est-ausencia { background: #6d8fc7; }
+.mes-tira.est-vacio { background: #d6dbe3; color: #6b7280; }
+.mes-tira.est-fuera { background: transparent; color: #c0c6d0; border: 1px dashed #d6dbe3; }
+.leyenda-tira { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; font-size: .75rem; color: var(--gris); margin: 10px 0 0; }
+.leyenda-tira span { display: inline-flex; align-items: center; gap: 5px; }
+.leyenda-tira i.mes-tira { width: 14px; height: 14px; border-radius: 3px; }
+@media print { .informe-resumen { grid-template-columns: 1fr 1fr; } }

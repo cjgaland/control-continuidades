@@ -175,3 +175,41 @@ export function validarRegistro(anio, mes, r) {
   }
   return errores;
 }
+
+// ---------- Resumen del año (para el informe) ----------
+
+// Estado de cada mes para la tira de colores del informe:
+// 'fuera' (antes de agosto de 2024), 'ausencia', 'abonado', 'pendiente', 'prevision' o 'vacio'.
+export function estadoMes(datos, clave, persona, hoy) {
+  if (clave < INICIO) return 'fuera';
+  const r = registro(datos, clave, persona);
+  if (r.ausencia) return 'ausencia';
+  if (r.abonado) return 'abonado';
+  if (r.dias.length === 0) return 'vacio';
+  return clave > claveDeHoy(hoy) ? 'prevision' : 'pendiente';
+}
+
+// Totales del año de una persona: días solicitados frente al cupo y meses abonados/pendientes.
+export function resumenAnual(datos, anio, persona, hoy) {
+  let solicitados = 0;
+  let cupo = 0;
+  const estados = [];
+  for (let m = 1; m <= 12; m++) {
+    const clave = claveMes(anio, m);
+    const r = registro(datos, clave, persona);
+    const estado = estadoMes(datos, clave, persona, hoy);
+    estados.push(estado);
+    if (estado === 'fuera' || estado === 'ausencia') continue;
+    solicitados += r.dias.length;
+    if (r.dias.length > 0 || mesTerminado(clave, hoy)) cupo += PERSONAS[persona].cupo;
+  }
+  const cuenta = (e) => estados.filter((x) => x === e).length;
+  return {
+    solicitados,
+    cupo,
+    abonados: cuenta('abonado'),
+    pendientes: cuenta('pendiente') + cuenta('prevision'),
+    prevision: cuenta('prevision'),
+    estados,
+  };
+}

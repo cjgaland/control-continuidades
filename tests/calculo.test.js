@@ -94,3 +94,21 @@ test('Todos los datos guardados son válidos', () => {
     }
   }
 });
+
+test('Resumen anual: solicitados frente al cupo y meses abonados/pendientes', async () => {
+  const { resumenAnual } = await import('../app/js/calculo.js');
+  const r26 = resumenAnual(datos, 2026, 'rafa', HOY);
+  assert.deepEqual(
+    { s: r26.solicitados, c: r26.cupo, a: r26.abonados, p: r26.pendientes, v: r26.prevision },
+    { s: 33, c: 55, a: 8, p: 3, v: 1 },
+  );
+  assert.equal(r26.cupo - r26.solicitados, debitoAnual(datos, 2026, 'rafa', HOY)); // 22
+  assert.deepEqual(r26.estados.slice(7), ['abonado', 'pendiente', 'pendiente', 'prevision', 'vacio']);
+
+  const r24 = resumenAnual(datos, 2024, 'rafa', HOY);
+  assert.deepEqual([r24.solicitados, r24.cupo, r24.abonados, r24.pendientes], [18, 25, 5, 0]);
+  assert.equal(r24.estados[0], 'fuera');
+
+  const r25 = resumenAnual(datos, 2025, 'carlos', HOY);
+  assert.deepEqual([r25.solicitados, r25.cupo, r25.abonados, r25.pendientes], [48, 48, 12, 0]);
+});
