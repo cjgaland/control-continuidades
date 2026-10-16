@@ -170,3 +170,25 @@ table.excel.totales td:not(.mes-nombre) { width: 18%; }
 table.excel.totales td.mes-nombre { white-space: normal; }
 @media (max-width: 480px) { .informe { padding: 10px; } .informe .titulo { font-size: 1.05rem; } }
 @media print { .desplazable { overflow: visible; } .desplazable table.excel { min-width: 0; } }
+
+/* ---------- Escrito ---------- */
+.formulario { display: grid; gap: 10px; margin-bottom: 14px; }
+.formulario label { display: grid; gap: 4px; font-size: .85rem; color: var(--gris); }
+.formulario label.casilla { display: flex; align-items: center; gap: 8px; color: var(--texto); font-size: .95rem; }
+.formulario input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--marino); }
+@media (min-width: 760px) { .formulario { grid-template-columns: repeat(3, 1fr) ; } .formulario label.casilla { grid-column: 1 / -1; } }
+
+.correo { margin: 0 0 10px; background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 8px 12px; font-size: .85rem; }
+.correo div { display: grid; grid-template-columns: 56px 1fr; gap: 6px; padding: 2px 0; }
+.correo dt { color: var(--gris); }
+.correo dd { margin: 0; word-break: break-word; }
+
+.texto-escrito {
+  width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; line-height: 1.45;
+  white-space: pre-wrap; resize: vertical;
+}
+.botones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+@media (min-width: 760px) { .botones { display: flex; flex-wrap: wrap; } }
+.aviso { min-height: 1.4em; font-size: .9rem; color: var(--verde); }
+.aviso.error { color: var(--rojo); background: none; padding: 0; }
+.nota { font-size: .8rem; color: var(--gris); }

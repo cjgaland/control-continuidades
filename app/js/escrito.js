@@ -3,7 +3,7 @@
 
 import {
   PERSONAS, NOMBRES_MES, ABREV_MES, partirClave, nombreMes, mesSiguiente, diaSemana,
-  registro, debitoMensual, acumuladoTotal, abonadoHasta,
+  registro, debitoMensual, acumuladoTotal, abonadoHasta, claveDeHoy, INICIO,
 } from './calculo.js';
 
 export const CORREO = {
@@ -112,4 +112,28 @@ export function nombrePdf(opciones, hoy) {
     ? `${partes.map((p) => ABREV_MES[p.mes - 1]).join('-')}_${partes[0].anio}`
     : partes.map((p) => `${ABREV_MES[p.mes - 1]}-${p.anio}`).join('_');
   return `${fecha}_Escrito_${meses}.pdf`;
+}
+
+// Propuesta para el formulario: desde el mes siguiente al último abonado (el más antiguo de los dos)
+// hasta el mes siguiente al actual, que va como previsión. Máximo 4 meses.
+export function propuestaEscrito(datos, hoy) {
+  const abonados = ['rafa', 'carlos'].map((p) => abonadoHasta(datos, p));
+  const base = abonados.some((c) => !c) ? null : abonados.sort()[0];
+  const actual = claveDeHoy(hoy);
+  const ultimo = mesSiguiente(actual);
+  let primerMes = base ? mesSiguiente(base) : INICIO;
+  if (primerMes > ultimo) primerMes = ultimo;
+  let numMeses = 1;
+  while (mesSiguiente(primerMes, numMeses) <= ultimo) numMeses++;
+  if (numMeses > 4) {
+    primerMes = mesSiguiente(ultimo, -3);
+    numMeses = 4;
+  }
+  const f = hoy instanceof Date ? hoy : new Date();
+  return {
+    primerMes,
+    numMeses,
+    prevision: mesSiguiente(primerMes, numMeses - 1) > actual,
+    saludo: f.getHours() < 14 ? 'Buenos días' : 'Buenas tardes',
+  };
 }

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { generarEscrito, asuntoEscrito, nombrePdf, formatoDebito, enlaceCorreo } from '../app/js/escrito.js';
+import { generarEscrito, asuntoEscrito, nombrePdf, formatoDebito, enlaceCorreo, propuestaEscrito } from '../app/js/escrito.js';
 
 const datos = JSON.parse(readFileSync(new URL('../datos/continuidades.json', import.meta.url)));
 const modelo = readFileSync(new URL('../docs/modelo-escrito.md', import.meta.url), 'utf8');
@@ -63,4 +63,10 @@ test('Enlace de correo con destinatarios, CCO y asunto', () => {
   const url = enlaceCorreo('Asunto á', 'Línea 1\nLínea 2');
   assert.ok(url.startsWith('mailto:pedromanuel.castro.sspa@juntadeandalucia.es,soledad.delgado.sspa@juntadeandalucia.es?bcc=rjavier.romero.sspa@juntadeandalucia.es&subject='));
   assert.ok(url.includes('%0D%0A'));
+});
+
+test('Propuesta por defecto: septiembre, octubre y previsión de noviembre', () => {
+  const p = propuestaEscrito(datos, new Date(2026, 9, 16, 10, 0));
+  assert.deepEqual(p, { primerMes: '2026-09', numMeses: 3, prevision: true, saludo: 'Buenos días' });
+  assert.equal(propuestaEscrito(datos, new Date(2026, 9, 16, 17, 0)).saludo, 'Buenas tardes');
 });

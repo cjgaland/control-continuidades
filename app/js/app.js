@@ -3,8 +3,12 @@
 import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
-  resumen, aniosDisponibles, claveDeHoy, mesTerminado,
+  resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente,
 } from './calculo.js';
+import {
+  CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
+} from './escrito.js';
+import { crearPdf } from './pdf.js';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -14,6 +18,7 @@ const estado = {
   mesResumen: null,
   anioHistorico: 'todos',
   anioInforme: null,
+  escrito: null, // opciones del formulario del escrito
 };
 
 const $contenido = document.getElementById('contenido');
@@ -207,6 +212,133 @@ function vistaInforme() {
     </div>`;
 }
 
+// ---------- Escrito ----------
+
+function vistaEscrito() {
+  estado.escrito ??= propuestaEscrito(estado.datos, estado.hoy);
+  const o = estado.escrito;
+  const meses = rangoMeses(INICIO, mesSiguiente(ultimoMes())).reverse()
+    .map((c) => `<option value="${c}"${c === o.primerMes ? ' selected' : ''}>${nombreMes(c)}</option>`).join('');
+  const num = [1, 2, 3, 4].map((n) => `<option${n === o.numMeses ? ' selected' : ''}>${n}</option>`).join('');
+  const saludos = SALUDOS.map((x) => `<option${x === o.saludo ? ' selected' : ''}>${x}</option>`).join('');
+  const texto = generarEscrito(estado.datos, o, estado.hoy);
+  const compartir = puedeCompartirArchivos();
+
+  return `
+    <h2>Escrito a Gerencia</h2>
+    <div class="formulario">
+      <label>Primer mes <select id="esc-primer">${meses}</select></label>
+      <label>Número de meses <select id="esc-num">${num}</select></label>
+      <label>Saludo <select id="esc-saludo">${saludos}</select></label>
+      <label class="casilla"><input type="checkbox" id="esc-prev"${o.prevision ? ' checked' : ''}> El último mes es previsión</label>
+    </div>
+    <dl class="correo">
+      <div><dt>Para</dt><dd>${CORREO.para.join(', ')}</dd></div>
+      <div><dt>CCO</dt><dd>${CORREO.cco.join(', ')}</dd></div>
+      <div><dt>Asunto</dt><dd id="esc-asunto">${esc(asuntoEscrito(o))}</dd></div>
+    </dl>
+    <textarea id="esc-texto" class="texto-escrito" readonly rows="18">${esc(texto)}</textarea>
+    <div class="botones">
+      <button class="boton" id="btn-copiar" type="button">Copiar texto</button>
+      <button class="boton" id="btn-correo" type="button">Abrir correo</button>
+      <button class="boton secundario" id="btn-pdf" type="button">Guardar PDF</button>
+      ${compartir ? '<button class="boton secundario" id="btn-compartir" type="button">Compartir PDF (Drive)</button>' : ''}
+    </div>
+    <p id="esc-aviso" class="aviso" role="status"></p>
+    <p class="nota">El correo se envía desde tu cuenta corporativa (${CORREO.de}).
+      El PDF se archiva en Google Drive: <b>Mi unidad › Control Continuidades › Escritos › ${partirClave(o.primerMes).anio}</b>${
+      compartir ? '. En el móvil, pulsa «Compartir PDF» y elige Drive.' : '.'}</p>`;
+}
+
+function puedeCompartirArchivos() {
+  try {
+    const prueba = new File(['x'], 'prueba.pdf', { type: 'application/pdf' });
+    return !!navigator.canShare?.({ files: [prueba] }) && matchMedia('(pointer: coarse)').matches;
+  } catch { return false; }
+}
+
+function aviso(texto, error = false) {
+  const el = document.getElementById('esc-aviso');
+  if (!el) return;
+  el.textContent = texto;
+  el.classList.toggle('error', error);
+}
+
+async function copiarTexto() {
+  const texto = generarEscrito(estado.datos, estado.escrito, estado.hoy);
+  try {
+    await navigator.clipboard.writeText(texto);
+  } catch {
+    const ta = document.getElementById('esc-texto');
+    ta.select();
+    document.execCommand('copy');
+  }
+  aviso('Texto copiado. Ya puedes pegarlo en el correo.');
+}
+
+function abrirCorreo() {
+  const o = estado.escrito;
+  location.href = enlaceCorreo(asuntoEscrito(o), generarEscrito(estado.datos, o, estado.hoy));
+}
+
+async function pdfDelEscrito() {
+  const o = estado.escrito;
+  const fecha = estado.hoy.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  const blob = await crearPdf(generarEscrito(estado.datos, o, estado.hoy), [
+    ['De', CORREO.de],
+    ['Para', CORREO.para.join(', ')],
+    ['CCO', CORREO.cco.join(', ')],
+    ['Asunto', asuntoEscrito(o)],
+    ['Fecha', fecha],
+  ]);
+  return { blob, nombre: nombrePdf(o, estado.hoy) };
+}
+
+async function guardarPdf() {
+  aviso('Preparando el PDF…');
+  try {
+    const { blob, nombre } = await pdfDelEscrito();
+    // En Chrome/Edge del ordenador se puede elegir la carpeta (la de Google Drive) y la recuerda.
+    if (window.showSaveFilePicker) {
+      try {
+        const h = await window.showSaveFilePicker({
+          suggestedName: nombre, id: 'escritos', startIn: 'documents',
+          types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
+        });
+        const w = await h.createWritable();
+        await w.write(blob);
+        await w.close();
+        aviso(`Guardado: ${nombre}`);
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') { aviso(''); return; }
+      }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: nombre });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    aviso(`Descargado: ${nombre}. Muévelo a la carpeta Escritos de Google Drive.`);
+  } catch (err) {
+    aviso(err.message, true);
+  }
+}
+
+async function compartirPdf() {
+  aviso('Preparando el PDF…');
+  try {
+    const { blob, nombre } = await pdfDelEscrito();
+    const archivo = new File([blob], nombre, { type: 'application/pdf' });
+    await navigator.share({ files: [archivo], title: nombre });
+    aviso('');
+  } catch (err) {
+    if (err.name !== 'AbortError') aviso(err.message, true);
+    else aviso('');
+  }
+}
+
 // ---------- Pantallas de las fases siguientes ----------
 
 const vistaPendiente = (titulo) => `<h2>${titulo}</h2><p class="vacio">Esta pantalla llega en la siguiente fase.</p>`;
@@ -217,7 +349,7 @@ const VISTAS = {
   resumen: vistaResumen,
   historico: vistaHistorico,
   informe: vistaInforme,
-  escrito: () => vistaPendiente('Escrito'),
+  escrito: vistaEscrito,
   ajustes: () => vistaPendiente('Ajustes'),
 };
 
@@ -237,12 +369,23 @@ $contenido.addEventListener('change', (e) => {
   if (id === 'sel-mes') estado.mesResumen = e.target.value;
   else if (id === 'sel-anio-h') estado.anioHistorico = e.target.value;
   else if (id === 'sel-anio-i') estado.anioInforme = e.target.value;
+  else if (id === 'esc-primer') estado.escrito.primerMes = e.target.value;
+  else if (id === 'esc-num') estado.escrito.numMeses = Number(e.target.value);
+  else if (id === 'esc-saludo') estado.escrito.saludo = e.target.value;
+  else if (id === 'esc-prev') estado.escrito.prevision = e.target.checked;
   else return;
   pintar();
 });
 
 $contenido.addEventListener('click', (e) => {
-  if (e.target.id === 'btn-imprimir') window.print();
+  const acciones = {
+    'btn-imprimir': () => window.print(),
+    'btn-copiar': copiarTexto,
+    'btn-correo': abrirCorreo,
+    'btn-pdf': guardarPdf,
+    'btn-compartir': compartirPdf,
+  };
+  acciones[e.target.id]?.();
 });
 
 window.addEventListener('hashchange', pintar);
