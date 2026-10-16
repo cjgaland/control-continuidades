@@ -192,3 +192,27 @@ table.excel.totales td.mes-nombre { white-space: normal; }
 .aviso { min-height: 1.4em; font-size: .9rem; color: var(--verde); }
 .aviso.error { color: var(--rojo); background: none; padding: 0; }
 .nota { font-size: .8rem; color: var(--gris); }
+
+/* ---------- Editar ---------- */
+fieldset.editor { margin: 0; padding: 0 14px 12px; display: grid; gap: 10px; }
+fieldset.editor legend { background: var(--marino); color: #fff; padding: 4px 12px; border-radius: 6px; font-weight: 700; margin-top: 10px; }
+fieldset.editor legend small { font-weight: 400; opacity: .8; }
+fieldset.editor label { display: grid; gap: 4px; font-size: .85rem; color: var(--gris); }
+fieldset.editor label.casilla { display: flex; align-items: center; gap: 8px; color: var(--texto); font-size: .95rem; }
+fieldset.editor input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--marino); }
+.dias-editor { display: grid; gap: 6px; }
+.campo-dia { display: grid; grid-template-columns: 84px 1fr; align-items: center; gap: 10px; }
+.campo-dia input { width: 84px; text-align: center; font-size: 1.05rem; }
+.campo-dia input:disabled { background: #f0f0f0; }
+.sem { color: var(--gris); }
+.sem.mal { color: var(--rojo); font-weight: 700; }
+.errores { margin: 0; padding-left: 18px; color: var(--rojo); font-size: .88rem; }
+.errores:empty { display: none; }
+
+/* ---------- Ajustes ---------- */
+.tarjeta + .tarjeta { margin-top: 14px; }
+label.campo { display: grid; gap: 4px; font-size: .85rem; color: var(--gris); margin-bottom: 10px; }
+label.campo input { width: 100%; }
+.guia ol { padding-left: 20px; margin: 0 0 10px; }
+.guia li { margin-bottom: 6px; }
+code { background: var(--claro-2); padding: 1px 5px; border-radius: 4px; font-size: .88em; }

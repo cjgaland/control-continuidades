@@ -3,8 +3,12 @@
 import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
-  resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente,
+  resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS,
 } from './calculo.js';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js';
+import {
+  repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
+} from './github.js';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
 } from './escrito.js';
@@ -19,6 +23,10 @@ const estado = {
   anioHistorico: 'todos',
   anioInforme: null,
   escrito: null, // opciones del formulario del escrito
+  token: null, // token de GitHub (solo en este dispositivo)
+  sha: null, // versión del archivo en GitHub que se ha cargado
+  edicion: null, // borrador del mes que se está editando
+  avisoCarga: '',
 };
 
 const $contenido = document.getElementById('contenido');
@@ -339,9 +347,248 @@ async function compartirPdf() {
   }
 }
 
-// ---------- Pantallas de las fases siguientes ----------
+// ---------- Editar (solo con token) ----------
 
-const vistaPendiente = (titulo) => `<h2>${titulo}</h2><p class="vacio">Esta pantalla llega en la siguiente fase.</p>`;
+function borradorDelMes(clave) {
+  const reg = (p) => {
+    const r = registro(estado.datos, clave, p);
+    const dias = r.dias.map(String);
+    while (dias.length < MAX_DIAS) dias.push('');
+    return { dias, ausencia: r.ausencia, abonado: r.abonado };
+  };
+  return { clave, registros: { rafa: reg('rafa'), carlos: reg('carlos') }, sucio: false, guardando: false };
+}
+
+function registrosDelBorrador() {
+  const out = {};
+  for (const [p, r] of Object.entries(estado.edicion.registros)) {
+    out[p] = {
+      dias: r.ausencia ? [] : r.dias.filter((d) => d.trim() !== '').map(Number),
+      ausencia: r.ausencia,
+      abonado: r.abonado,
+    };
+  }
+  return out;
+}
+
+function textoSemana(clave, valor) {
+  const d = Number(valor);
+  if (valor.trim() === '') return '';
+  const { anio, mes } = partirClave(clave);
+  if (!Number.isInteger(d) || d < 1 || d > new Date(anio, mes, 0).getDate()) return '¡no existe!';
+  return diaSemana(anio, mes, d);
+}
+
+function vistaEditar() {
+  if (!estado.token) return '<h2>Editar</h2><p class="vacio">Para editar, pega tu token en Ajustes.</p>';
+  estado.edicion ??= borradorDelMes(claveDeHoy(estado.hoy));
+  const ed = estado.edicion;
+  const meses = rangoMeses(INICIO, mesSiguiente(ultimoMes(), 2)).reverse()
+    .map((c) => `<option value="${c}"${c === ed.clave ? ' selected' : ''}>${nombreMes(c)}${estado.datos.meses[c] ? '' : ' (vacío)'}</option>`).join('');
+
+  const bloques = Object.keys(PERSONAS).map((p) => {
+    const r = ed.registros[p];
+    const campos = r.dias.map((v, i) => `
+      <div class="campo-dia">
+        <input type="number" inputmode="numeric" min="1" max="31" placeholder="—" value="${esc(v)}"
+          data-p="${p}" data-i="${i}" class="ed-dia" aria-label="${PERSONAS[p].nombre}, día ${i + 1}"${r.ausencia ? ' disabled' : ''}>
+        <span class="sem" id="sem-${p}-${i}">${r.ausencia ? '' : textoSemana(ed.clave, v)}</span>
+      </div>`).join('');
+    return `
+      <fieldset class="tarjeta editor">
+        <legend>${PERSONAS[p].nombre} <small>cupo ${PERSONAS[p].cupo}</small></legend>
+        <div class="dias-editor">${campos}</div>
+        <label>Mes completo
+          <select class="ed-ausencia" data-p="${p}">
+            <option value=""${!r.ausencia ? ' selected' : ''}>Trabajado (se cuentan los días)</option>
+            <option value="vacaciones"${r.ausencia === 'vacaciones' ? ' selected' : ''}>Vacaciones (sin débito)</option>
+            <option value="baja"${r.ausencia === 'baja' ? ' selected' : ''}>Baja (sin débito)</option>
+          </select>
+        </label>
+        <label class="casilla"><input type="checkbox" class="ed-abonado" data-p="${p}"${r.abonado ? ' checked' : ''}> Abonado</label>
+        <ul class="errores" id="err-${p}"></ul>
+      </fieldset>`;
+  }).join('');
+
+  return `
+    <h2>Alta y edición mensual</h2>
+    <div class="barra">
+      <label for="ed-mes">Mes</label>
+      <select id="ed-mes">${meses}</select>
+    </div>
+    <div class="tarjetas">${bloques}</div>
+    <div class="botones">
+      <button class="boton" id="btn-guardar" type="button">Guardar en GitHub</button>
+      <button class="boton secundario" id="btn-deshacer" type="button">Deshacer cambios</button>
+    </div>
+    <p id="ed-aviso" class="aviso" role="status"></p>
+    <p class="nota">Al guardar se hace un commit en GitHub. La app publicada se actualiza en uno o dos minutos.</p>`;
+}
+
+function refrescarEditor() {
+  const ed = estado.edicion;
+  if (!ed || !document.getElementById('btn-guardar')) return;
+  const errores = validarMes(ed.clave, registrosDelBorrador());
+  let hay = false;
+  for (const p of Object.keys(PERSONAS)) {
+    ed.registros[p].dias.forEach((v, i) => {
+      const s = document.getElementById(`sem-${p}-${i}`);
+      const t = ed.registros[p].ausencia ? '' : textoSemana(ed.clave, v);
+      s.textContent = t;
+      s.classList.toggle('mal', t === '¡no existe!');
+    });
+    document.getElementById(`err-${p}`).innerHTML = errores[p].map((e) => `<li>${esc(e)}</li>`).join('');
+    if (errores[p].length) hay = true;
+  }
+  const b = document.getElementById('btn-guardar');
+  b.disabled = hay || !ed.sucio || ed.guardando;
+  b.textContent = ed.guardando ? 'Guardando…' : 'Guardar en GitHub';
+  document.getElementById('btn-deshacer').disabled = !ed.sucio || ed.guardando;
+}
+
+function avisoEditor(texto, error = false) {
+  const el = document.getElementById('ed-aviso');
+  if (!el) return;
+  el.textContent = texto;
+  el.classList.toggle('error', error);
+}
+
+async function guardarMes() {
+  const ed = estado.edicion;
+  const registros = registrosDelBorrador();
+  const errores = validarMes(ed.clave, registros);
+  if (Object.values(errores).some((e) => e.length)) return;
+  ed.guardando = true;
+  refrescarEditor();
+  avisoEditor('Guardando en GitHub…');
+  const mensaje = mensajeCommit(estado.datos, ed.clave);
+  const nuevos = aplicarMes(estado.datos, ed.clave, registros, new Date());
+  try {
+    estado.sha = await guardarDatos(estado.token, nuevos, estado.sha, mensaje);
+    estado.datos = nuevos;
+    estado.escrito = null;
+    estado.edicion = borradorDelMes(ed.clave);
+    pintar();
+    avisoEditor(`Guardado («${mensaje}»).`);
+  } catch (err) {
+    ed.guardando = false;
+    if (err instanceof ErrorConflicto) {
+      await recargarDesdeGitHub();
+      estado.edicion = borradorDelMes(ed.clave);
+      pintar();
+    } else {
+      refrescarEditor();
+    }
+    avisoEditor(err.message, true);
+  }
+}
+
+function cambiarMesEditor(clave) {
+  if (estado.edicion?.sucio && !confirm('Hay cambios sin guardar en este mes. ¿Descartarlos?')) {
+    document.getElementById('ed-mes').value = estado.edicion.clave;
+    return;
+  }
+  estado.edicion = borradorDelMes(clave);
+  pintar();
+}
+
+function entradaEditor(e) {
+  const t = e.target;
+  const ed = estado.edicion;
+  if (!ed || !t.dataset.p) return false;
+  const r = ed.registros[t.dataset.p];
+  if (t.classList.contains('ed-dia')) r.dias[Number(t.dataset.i)] = t.value;
+  else if (t.classList.contains('ed-abonado')) r.abonado = t.checked;
+  else if (t.classList.contains('ed-ausencia')) {
+    r.ausencia = t.value || null;
+    if (r.ausencia && r.dias.some((d) => d !== '') && !confirm('Se borrarán los días anotados de este mes. ¿Seguir?')) {
+      t.value = '';
+      r.ausencia = null;
+      return true;
+    }
+    if (r.ausencia) r.dias = r.dias.map(() => '');
+    ed.sucio = true;
+    pintar();
+    return true;
+  } else return false;
+  ed.sucio = true;
+  refrescarEditor();
+  return true;
+}
+
+// ---------- Ajustes ----------
+
+function vistaAjustes() {
+  const { owner, repo } = repositorio();
+  const conToken = !!estado.token;
+  return `
+    <h2>Ajustes</h2>
+    <section class="tarjeta">
+      <header><strong>Modo edición</strong><small>Repositorio: ${esc(owner)}/${esc(repo)}</small></header>
+      <div class="cuerpo">
+        ${conToken
+    ? `<p>✅ Este dispositivo tiene guardado un token de edición${estado.avisoCarga ? '' : ' y se puede editar'}.</p>
+           <button class="boton secundario" id="btn-olvidar" type="button">Cerrar sesión / olvidar token</button>`
+    : `<p>Sin token solo se pueden consultar los datos. Para editar en este dispositivo, pega aquí tu token de GitHub.</p>
+           <label class="campo">Token de GitHub
+             <input type="password" id="aj-token" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…">
+           </label>
+           <button class="boton" id="btn-token" type="button">Guardar token</button>`}
+        <p id="aj-aviso" class="aviso" role="status">${estado.avisoCarga ? esc(estado.avisoCarga) : ''}</p>
+        <p class="nota">El token se guarda solo en este navegador (no va a GitHub ni al código).
+          Si pierdes el móvil o el ordenador, revócalo en GitHub y crea otro.</p>
+      </div>
+    </section>
+
+    <section class="tarjeta guia">
+      <header><strong>Cómo crear el token (una vez)</strong><small>Desde el ordenador es más cómodo</small></header>
+      <div class="cuerpo">
+        <ol>
+          <li>Entra en <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com › Settings › Developer settings › Personal access tokens › <b>Fine-grained tokens</b> › Generate new token</a>.</li>
+          <li><b>Token name</b>: por ejemplo <code>Continuidades – Mac</code> (o <code>– móvil</code>). Mejor un token por dispositivo.</li>
+          <li><b>Expiration</b>: 1 año (cuando caduque, se crea otro igual).</li>
+          <li><b>Repository access</b>: <i>Only select repositories</i> y elige <b>${esc(repo)}</b>. Solo ese.</li>
+          <li><b>Permissions › Repository permissions › Contents</b>: <i>Read and write</i>. Nada más (Metadata se pone solo en lectura).</li>
+          <li>Pulsa <b>Generate token</b> y copia el texto que empieza por <code>github_pat_</code>. GitHub solo lo enseña una vez.</li>
+          <li>Pégalo arriba y pulsa <b>Guardar token</b>. Aparecerá la pestaña <b>Editar</b>.</li>
+        </ol>
+        <p class="nota">En el móvil: crea el token desde el ordenador, envíatelo de forma privada (por ejemplo, con AirDrop o una nota),
+          pégalo aquí y después borra ese mensaje o nota.</p>
+      </div>
+    </section>`;
+}
+
+async function guardarTokenDesdeAjustes() {
+  const input = document.getElementById('aj-token');
+  const token = input.value.trim();
+  const av = document.getElementById('aj-aviso');
+  if (!token) return;
+  av.classList.remove('error');
+  av.textContent = 'Comprobando el token…';
+  try {
+    const repo = await comprobarToken(token);
+    guardarToken(token);
+    estado.token = token;
+    await recargarDesdeGitHub();
+    actualizarModo();
+    pintar();
+    document.getElementById('aj-aviso').textContent = `Token correcto: puedes editar ${repo}.`;
+  } catch (err) {
+    av.classList.add('error');
+    av.textContent = err.message;
+  }
+}
+
+function olvidarTokenDesdeAjustes() {
+  if (!confirm('¿Olvidar el token en este dispositivo? Podrás volver a pegarlo cuando quieras.')) return;
+  olvidarToken();
+  estado.token = null;
+  estado.sha = null;
+  estado.edicion = null;
+  estado.avisoCarga = '';
+  actualizarModo();
+  pintar();
+}
 
 // ---------- Navegación ----------
 
@@ -350,11 +597,13 @@ const VISTAS = {
   historico: vistaHistorico,
   informe: vistaInforme,
   escrito: vistaEscrito,
-  ajustes: () => vistaPendiente('Ajustes'),
+  editar: vistaEditar,
+  ajustes: vistaAjustes,
 };
 
 function vistaActual() {
   const v = location.hash.slice(1);
+  if (v === 'editar' && !estado.token) return 'ajustes';
   return VISTAS[v] ? v : 'resumen';
 }
 
@@ -362,7 +611,17 @@ function pintar() {
   const v = vistaActual();
   document.querySelectorAll('#pestanas a').forEach((a) => a.classList.toggle('activa', a.dataset.vista === v));
   $contenido.innerHTML = VISTAS[v]();
+  if (v === 'editar') refrescarEditor();
 }
+
+function actualizarModo() {
+  document.querySelectorAll('.solo-edicion').forEach((el) => { el.hidden = !estado.token; });
+  document.getElementById('estado').textContent = estado.token ? 'Modo edición' : '';
+}
+
+$contenido.addEventListener('input', (e) => {
+  if (e.target.classList.contains('ed-dia')) entradaEditor(e);
+});
 
 $contenido.addEventListener('change', (e) => {
   const id = e.target.id;
@@ -373,6 +632,9 @@ $contenido.addEventListener('change', (e) => {
   else if (id === 'esc-num') estado.escrito.numMeses = Number(e.target.value);
   else if (id === 'esc-saludo') estado.escrito.saludo = e.target.value;
   else if (id === 'esc-prev') estado.escrito.prevision = e.target.checked;
+  else if (id === 'ed-mes') { cambiarMesEditor(e.target.value); return; }
+  else if (e.target.classList.contains('ed-ausencia')) { entradaEditor(e); return; }
+  else if (e.target.classList.contains('ed-abonado')) { entradaEditor(e); return; }
   else return;
   pintar();
 });
@@ -384,24 +646,51 @@ $contenido.addEventListener('click', (e) => {
     'btn-correo': abrirCorreo,
     'btn-pdf': guardarPdf,
     'btn-compartir': compartirPdf,
+    'btn-guardar': guardarMes,
+    'btn-deshacer': () => { estado.edicion = borradorDelMes(estado.edicion.clave); pintar(); },
+    'btn-token': guardarTokenDesdeAjustes,
+    'btn-olvidar': olvidarTokenDesdeAjustes,
   };
   acciones[e.target.id]?.();
 });
 
 window.addEventListener('hashchange', pintar);
 
+window.addEventListener('beforeunload', (e) => {
+  if (estado.edicion?.sucio) e.preventDefault();
+});
+
 // ---------- Carga de datos ----------
 
-async function cargarDatos() {
+async function cargarDatosPublicos() {
   // ?t= evita que el navegador o GitHub Pages devuelvan una copia antigua.
   const r = await fetch(`${URL_DATOS}?t=${Date.now()}`, { cache: 'no-store' });
   if (!r.ok) throw new Error(`No se han podido cargar los datos (${r.status}).`);
   return r.json();
 }
 
+// Con token se lee directamente de GitHub: datos al momento y el "sha" necesario para guardar.
+async function recargarDesdeGitHub() {
+  const { datos, sha } = await leerDatos(estado.token);
+  estado.datos = datos;
+  estado.sha = sha;
+  estado.avisoCarga = '';
+}
+
 async function iniciar() {
+  estado.token = leerToken();
+  actualizarModo();
   try {
-    estado.datos = await cargarDatos();
+    if (estado.token) {
+      try {
+        await recargarDesdeGitHub();
+      } catch (err) {
+        estado.avisoCarga = `No se ha podido leer de GitHub con el token: ${err.message} Se muestran los datos publicados; para guardar, revisa el token.`;
+        estado.datos = await cargarDatosPublicos();
+      }
+    } else {
+      estado.datos = await cargarDatosPublicos();
+    }
     pintar();
   } catch (err) {
     $contenido.innerHTML = `<p class="error">${esc(err.message)}</p>`;
