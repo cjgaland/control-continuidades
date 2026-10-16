@@ -47,9 +47,10 @@ La app **no lee nada de Drive**, así que Drive no la ralentiza. Drive solo reci
 app/        App web: index.html, css/, js/ (sin frameworks ni compilación)
 datos/      continuidades.json — el único sitio donde se guardan los datos
 docs/       Reglas, modelo del escrito y ejemplos
-scripts/    Utilidades (extraer_excel.py, servidor.mjs para probar en local)
+scripts/    Utilidades (extraer_excel.py, servidor.mjs para probar en local, nueva-version.mjs)
 tests/      Tests (npm test)
-index.html  Portada que redirige a app/ (GitHub Pages publica la raíz del repositorio)
+index.html  Redirige a app/ (GitHub Pages publica la raíz del repositorio)
+Backup/     Copias de seguridad locales (no se suben a GitHub)
 ```
 Los escritos en PDF **no** se guardan en el repositorio, van a Google Drive.
 
@@ -95,3 +96,22 @@ El Excel y los escritos reales **no** van al repositorio (están en Drive, compa
 `.gitignore` bloquea `*.xlsx` y `*.pdf`. No subas nada personal o sensible sin preguntar.
 Los PDF de los escritos no se publican, solo están en Drive.
 El token de edición **nunca** va al código ni a un commit. Si se pierde un dispositivo, se revoca el token en GitHub.
+
+## Versiones y avisos de actualización
+- La versión está en `app/js/version.js` (número, año e historial que se ve en Ayuda y en la portada).
+- Para publicar una versión nueva: `node scripts/nueva-version.mjs 1.2 "Qué cambia"`. Cambia el número, añade
+  la entrada al historial y actualiza los `?v=` de `index.html` y de los `import` (evita que el navegador use
+  archivos antiguos de la caché de Pages). **Todos los `import` entre módulos deben llevar el mismo `?v=`.**
+- La app comprueba cada minuto (y al volver a la pestaña) si hay versión nueva o datos nuevos, y muestra un aviso
+  con el botón «Actualizar». No hay service worker, a propósito (dio problemas en otras apps).
+
+## Copias de seguridad locales
+
+Sistema de respaldo local con rotación (carpeta `Backup/`, ignorada en git):
+
+- Cada copia es una carpeta `Backup/Copia_Seguridad_ControlContinuidades_DD_MM_YYYY-HH_MM` con el proyecto
+  completo (rsync -a), excluyendo `Backup`, `.git`, `.DS_Store` y datos personales/secretos (`*.csv`, `.env*`).
+- Se conservan solo las **5 copias más recientes**; al crear una nueva se borra la más antigua.
+- Disparadores: "Haz una copia" / "Copia de seguridad", o antes de publicar una versión nueva.
+- Script: skill personal `app-copia_seguridad`
+  (`bash /Users/Trabajo/.claude/skills/app-copia_seguridad/scripts/copia_seguridad.sh --root "/Users/Trabajo/Desktop/Control Continuidades" --name "ControlContinuidades"`).

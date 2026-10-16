@@ -4,15 +4,16 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS,
-} from './calculo.js';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js';
+} from './calculo.js?v=1.1';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.1';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js';
+} from './github.js?v=1.1';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js';
-import { crearPdf } from './pdf.js';
+} from './escrito.js?v=1.1';
+import { crearPdf } from './pdf.js?v=1.1';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.1';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -590,9 +591,133 @@ function olvidarTokenDesdeAjustes() {
   pintar();
 }
 
+// ---------- Portada ----------
+
+const pie = () => `<p class="autoria">Diseñado y desarrollado por ${AUTOR} · v${VERSION} · ${ANIO}</p>`;
+
+function vistaInicio() {
+  const act = estado.datos.actualizado
+    ? `Datos actualizados el ${estado.datos.actualizado.split('-').reverse().join('/')}.` : '';
+  return `
+    <section class="portada">
+      <img src="img/icono-512.png" alt="" class="portada-logo" width="120" height="120">
+      <h2>Control de Continuidades</h2>
+      <p class="portada-sub">Área de Calidad y Seguridad del Paciente · Hospital Comarcal de Montilla</p>
+      <p class="portada-texto">Registro de las <b>continuidades asistenciales extra</b> de Rafa (5 al mes) y Carlos (4 al mes)
+        desde agosto de 2024: días realizados, <b>débitos</b> mensuales y acumulados, informe anual
+        y el <b>escrito mensual a Gerencia</b> con los días y la previsión del mes siguiente.</p>
+      <div class="portada-accesos">
+        <a class="boton" href="#resumen">Ver resumen</a>
+        <a class="boton secundario" href="#historico">Histórico</a>
+        <a class="boton secundario" href="#informe">Informe anual</a>
+        <a class="boton secundario" href="#escrito">Escrito</a>
+      </div>
+      <p class="nota">${act} <a href="#ayuda">Ayuda e historial de versiones</a></p>
+      ${pie()}
+    </section>`;
+}
+
+// ---------- Ayuda ----------
+
+function vistaAyuda() {
+  const historial = HISTORIAL.map((h) => `<li><b>v${h.version} · ${h.fecha}</b> — ${esc(h.cambios)}</li>`).join('');
+  return `
+    <h2>Ayuda</h2>
+    <section class="tarjeta ayuda"><div class="cuerpo">
+      <h3>Para qué sirve</h3>
+      <p>Sustituye al Excel de continuidades: guarda los días que hace cada uno, calcula lo que se debe
+        (cupo de 5 para Rafa y 4 para Carlos) y prepara el escrito mensual para Gerencia.</p>
+
+      <h3>Pantallas</h3>
+      <ul>
+        <li><b>Resumen</b>: débito del mes, acumulado del año, débito anual, acumulado total y hasta qué mes se ha abonado.</li>
+        <li><b>Histórico</b>: todos los meses desde agosto de 2024, con filtro por año. ✓ = abonado.</li>
+        <li><b>Informe</b>: el año en formato parecido a la hoja del Excel. Botón «Imprimir» (también sirve para guardar en PDF).</li>
+        <li><b>Escrito</b>: el texto para Gerencia, con «Copiar texto», «Abrir correo» y «Guardar PDF» (en el móvil, «Compartir PDF» para mandarlo a Drive).</li>
+        <li><b>Editar</b> (solo Carlos, con su token): anotar los días del mes, vacaciones o baja del mes completo y «abonado».</li>
+      </ul>
+
+      <h3>Cómo se calcula</h3>
+      <ul>
+        <li>Débito del mes = cupo − días hechos. Si se hacen más días que el cupo, sale a favor (+).</li>
+        <li>Un mes ya terminado sin días cuenta el débito completo. Un mes futuro sin días no cuenta todavía.</li>
+        <li>Vacaciones o baja del mes completo: sin débito.</li>
+        <li>Los días de la semana se calculan solos; no se puede anotar un día que no existe ni repetirlo.</li>
+      </ul>
+
+      <h3>Avisos de cambios</h3>
+      <p>Si mientras tienes la app abierta se guardan datos nuevos (por ejemplo, desde otro dispositivo) o se publica
+        una versión nueva, aparece arriba un aviso con el botón <b>Actualizar</b>. Al pulsarlo se recarga con lo último.</p>
+
+      <h3>Instalarla en el móvil</h3>
+      <ul>
+        <li><b>iPhone</b> (Safari): botón Compartir → «Añadir a pantalla de inicio».</li>
+        <li><b>Android</b> (Chrome): menú ⋮ → «Instalar aplicación» o «Añadir a pantalla de inicio».</li>
+      </ul>
+
+      <h3>Privacidad</h3>
+      <p>Cualquiera con el enlace puede consultar la app. Solo se puede modificar con el token de Carlos,
+        que se guarda únicamente en sus dispositivos. Los escritos en PDF se archivan en Google Drive, no aquí.</p>
+
+      <h3>Historial de versiones</h3>
+      <ul class="historial">${historial}</ul>
+      ${pie()}
+    </div></section>`;
+}
+
+// ---------- Aviso de cambios (datos nuevos o versión nueva) ----------
+
+const COMPROBAR_CADA_MS = 60 * 1000;
+const canonico = (datos) => JSON.stringify(datos);
+let datosPublicadosAlCargar = null; // para quien consulta sin token
+
+async function hayVersionNueva() {
+  const r = await fetch(`js/version.js?t=${Date.now()}`, { cache: 'no-store' });
+  if (!r.ok) return null;
+  const m = (await r.text()).match(/VERSION = '([^']+)'/);
+  return m && m[1] !== VERSION ? m[1] : null;
+}
+
+async function hayDatosNuevos() {
+  if (estado.token && estado.sha) {
+    const { sha } = await leerDatos(estado.token);
+    return sha !== estado.sha;
+  }
+  const publicados = canonico(await cargarDatosPublicos());
+  return datosPublicadosAlCargar !== null && publicados !== datosPublicadosAlCargar;
+}
+
+function mostrarAvisoCambios(texto) {
+  document.getElementById('aviso-cambios-texto').textContent = texto;
+  document.getElementById('aviso-cambios').hidden = false;
+}
+
+async function comprobarCambios() {
+  if (document.hidden || !document.getElementById('aviso-cambios').hidden) return;
+  try {
+    const v = await hayVersionNueva();
+    if (v) { mostrarAvisoCambios(`🔄 Hay una versión nueva de la app (v${v}).`); return; }
+    if (await hayDatosNuevos()) mostrarAvisoCambios('🔄 Se han guardado datos nuevos.');
+  } catch { /* sin conexión: se vuelve a intentar más tarde */ }
+}
+
+function actualizarApp() {
+  if (estado.edicion?.sucio && !confirm('Hay cambios sin guardar en Editar. ¿Actualizar y perderlos?')) return;
+  estado.edicion = null;
+  location.reload();
+}
+
+function vigilarCambios() {
+  setInterval(comprobarCambios, COMPROBAR_CADA_MS);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) comprobarCambios(); });
+  document.getElementById('btn-actualizar-app').addEventListener('click', actualizarApp);
+}
+
 // ---------- Navegación ----------
 
 const VISTAS = {
+  inicio: vistaInicio,
+  ayuda: vistaAyuda,
   resumen: vistaResumen,
   historico: vistaHistorico,
   informe: vistaInforme,
@@ -604,7 +729,7 @@ const VISTAS = {
 function vistaActual() {
   const v = location.hash.slice(1);
   if (v === 'editar' && !estado.token) return 'ajustes';
-  return VISTAS[v] ? v : 'resumen';
+  return VISTAS[v] ? v : 'inicio';
 }
 
 function pintar() {
@@ -654,7 +779,7 @@ $contenido.addEventListener('click', (e) => {
   acciones[e.target.id]?.();
 });
 
-window.addEventListener('hashchange', pintar);
+window.addEventListener('hashchange', () => { pintar(); window.scrollTo(0, 0); });
 
 window.addEventListener('beforeunload', (e) => {
   if (estado.edicion?.sucio) e.preventDefault();
@@ -687,11 +812,14 @@ async function iniciar() {
       } catch (err) {
         estado.avisoCarga = `No se ha podido leer de GitHub con el token: ${err.message} Se muestran los datos publicados; para guardar, revisa el token.`;
         estado.datos = await cargarDatosPublicos();
+        datosPublicadosAlCargar = canonico(estado.datos);
       }
     } else {
       estado.datos = await cargarDatosPublicos();
+      datosPublicadosAlCargar = canonico(estado.datos);
     }
     pintar();
+    vigilarCambios();
   } catch (err) {
     $contenido.innerHTML = `<p class="error">${esc(err.message)}</p>`;
   }

@@ -1,0 +1,16 @@
+{
+  "name": "Control de Continuidades · Área de Calidad",
+  "short_name": "Continuidades",
+  "description": "Control de las continuidades asistenciales extra del Área de Calidad del Hospital Comarcal de Montilla.",
+  "lang": "es-ES",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#1F3864",
+  "icons": [
+    { "src": "img/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

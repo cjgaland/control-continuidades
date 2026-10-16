@@ -4,14 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1F3864">
+  <meta name="description" content="Control de las continuidades asistenciales extra del Área de Calidad del Hospital Comarcal de Montilla.">
   <title>Continuidades · Área de Calidad</title>
-  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Continuidades">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/estilos.css?v=1.1">
 </head>
 <body>
   <header class="cabecera">
-    <h1>Continuidades <span>Área de Calidad</span></h1>
-    <span id="estado" class="estado"></span>
+    <a href="#inicio" class="marca" aria-label="Ir a la portada">
+      <img src="img/icono-192.png" alt="" width="34" height="34">
+      <h1>Continuidades <span>Área de Calidad</span></h1>
+    </a>
+    <div class="cabecera-derecha">
+      <span id="estado" class="estado"></span>
+      <a href="#ayuda" class="boton-ayuda" aria-label="Ayuda" title="Ayuda">?</a>
+    </div>
   </header>
+
+  <div id="aviso-cambios" class="aviso-cambios" role="status" hidden>
+    <span id="aviso-cambios-texto"></span>
+    <button type="button" id="btn-actualizar-app" class="boton">Actualizar</button>
+  </div>
 
   <main id="contenido">
     <p class="cargando">Cargando datos…</p>
@@ -26,6 +45,7 @@
     <a href="#ajustes" data-vista="ajustes"><span class="ico">⚙</span>Ajustes</a>
   </nav>
 
-  <script type="module" src="js/app.js"></script>
+  <!-- El ?v= cambia con cada versión para que el navegador no use archivos antiguos. -->
+  <script type="module" src="js/app.js?v=1.1"></script>
 </body>
 </html>

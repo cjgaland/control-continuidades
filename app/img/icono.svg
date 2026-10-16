@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Icono de Continuidades: un calendario (los días de continuidad) atravesado por un
+       latido que no se interrumpe (la continuidad asistencial). Colores del Excel. -->
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2F5597"/>
+      <stop offset="1" stop-color="#1F3864"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#fondo)"/>
+  <!-- Hoja del calendario -->
+  <rect x="104" y="128" width="304" height="268" rx="30" fill="#ffffff"/>
+  <path d="M104 158 a30 30 0 0 1 30 -30 h244 a30 30 0 0 1 30 30 v42 h-304 z" fill="#D9E2F3"/>
+  <!-- Anillas -->
+  <rect x="170" y="100" width="26" height="62" rx="13" fill="#ffffff" stroke="#1F3864" stroke-width="8"/>
+  <rect x="316" y="100" width="26" height="62" rx="13" fill="#ffffff" stroke="#1F3864" stroke-width="8"/>
+  <!-- Cuadrícula de días -->
+  <g fill="#D9E2F3">
+    <rect x="140" y="226" width="40" height="30" rx="7"/><rect x="198" y="226" width="40" height="30" rx="7"/>
+    <rect x="274" y="226" width="40" height="30" rx="7"/><rect x="332" y="226" width="40" height="30" rx="7"/>
+    <rect x="140" y="340" width="40" height="30" rx="7"/><rect x="198" y="340" width="40" height="30" rx="7"/>
+    <rect x="274" y="340" width="40" height="30" rx="7"/><rect x="332" y="340" width="40" height="30" rx="7"/>
+  </g>
+  <!-- Latido continuo -->
+  <polyline points="60,300 176,300 204,300 226,250 254,352 280,268 298,300 336,300 452,300"
+    fill="none" stroke="#C00000" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

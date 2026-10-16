@@ -1,6 +1,6 @@
 // Cambios sobre el JSON de datos (sin nada de interfaz ni de red).
 
-import { NOMBRES_MES, partirClave, validarRegistro } from './calculo.js';
+import { NOMBRES_MES, partirClave, validarRegistro } from './calculo.js?v=1.1';
 
 function registroVacio(r) {
   return !r || ((r.dias ?? []).length === 0 && !r.ausencia && !r.abonado);
