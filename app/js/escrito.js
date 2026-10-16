@@ -4,7 +4,7 @@
 import {
   PERSONAS, NOMBRES_MES, ABREV_MES, partirClave, nombreMes, mesSiguiente, diaSemana,
   registro, debitoMensual, acumuladoTotal, abonadoHasta, claveDeHoy, INICIO,
-} from './calculo.js?v=1.1';
+} from './calculo.js?v=1.2';
 
 export const CORREO = {
   de: 'carlosjavier.galan.sspa@juntadeandalucia.es',

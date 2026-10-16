@@ -241,8 +241,6 @@ code { background: var(--claro-2); padding: 1px 5px; border-radius: 4px; font-si
 .portada h2 { font-size: 1.5rem; margin: 16px 0 4px; }
 .portada-sub { color: var(--gris); font-size: .85rem; margin: 0 0 16px; }
 .portada-texto { text-align: left; background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 14px 16px; margin: 0 0 16px; }
-.portada-accesos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-.portada-accesos .boton:first-child { grid-column: 1 / -1; }
 .autoria { color: #9aa1ad; font-size: .78rem; text-align: center; margin: 20px 0 8px; }
 
 /* ---------- Ayuda ---------- */
@@ -252,3 +250,15 @@ code { background: var(--claro-2); padding: 1px 5px; border-radius: 4px; font-si
 .ayuda li { margin-bottom: 6px; }
 .historial { list-style: none; padding-left: 0 !important; }
 .historial li { border-left: 3px solid var(--marino-2); padding-left: 10px; }
+
+/* ---------- Bloques plegables (Ajustes) ---------- */
+details.plegable > summary {
+  list-style: none; cursor: pointer; background: var(--marino); color: #fff; padding: 10px 14px; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+details.plegable > summary::-webkit-details-marker { display: none; }
+details.plegable > summary::after { content: '▸'; margin-left: auto; transition: transform .2s; }
+details.plegable[open] > summary::after { transform: rotate(90deg); }
+details.plegable > summary small { font-weight: 400; opacity: .8; font-size: .78rem; }
+details.guia { margin-top: 12px; border-top: 1px solid var(--borde); padding-top: 10px; }
+details.guia > summary { cursor: pointer; color: var(--marino); font-weight: 600; margin-bottom: 8px; }

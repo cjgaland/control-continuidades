@@ -4,16 +4,16 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS,
-} from './calculo.js?v=1.1';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.1';
+} from './calculo.js?v=1.2';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.2';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.1';
+} from './github.js?v=1.2';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.1';
-import { crearPdf } from './pdf.js?v=1.1';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.1';
+} from './escrito.js?v=1.2';
+import { crearPdf } from './pdf.js?v=1.2';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.2';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -522,41 +522,47 @@ function entradaEditor(e) {
 function vistaAjustes() {
   const { owner, repo } = repositorio();
   const conToken = !!estado.token;
+  const formulario = conToken
+    ? `<p>✅ Este dispositivo tiene guardado un token de edición${estado.avisoCarga ? '' : ' y se puede editar'}.</p>
+       <button class="boton secundario" id="btn-olvidar" type="button">Cerrar sesión / olvidar token</button>`
+    : `<p>Para editar en este dispositivo, pega aquí el token de GitHub de Carlos.</p>
+       <label class="campo">Token de GitHub
+         <input type="password" id="aj-token" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…">
+       </label>
+       <button class="boton" id="btn-token" type="button">Guardar token</button>`;
   return `
     <h2>Ajustes</h2>
-    <section class="tarjeta">
-      <header><strong>Modo edición</strong><small>Repositorio: ${esc(owner)}/${esc(repo)}</small></header>
+    ${conToken ? '' : `
+    <section class="tarjeta"><div class="cuerpo">
+      <p>👀 Esta app es de <b>consulta</b>: no hace falta configurar nada. Los datos se actualizan solos
+        y, si hay cambios, sale un aviso con el botón «Actualizar».</p>
+    </div></section>`}
+
+    <details class="tarjeta plegable"${conToken || estado.avisoCarga ? ' open' : ''}>
+      <summary>🔒 Modo edición <small>Solo para Carlos</small></summary>
       <div class="cuerpo">
-        ${conToken
-    ? `<p>✅ Este dispositivo tiene guardado un token de edición${estado.avisoCarga ? '' : ' y se puede editar'}.</p>
-           <button class="boton secundario" id="btn-olvidar" type="button">Cerrar sesión / olvidar token</button>`
-    : `<p>Sin token solo se pueden consultar los datos. Para editar en este dispositivo, pega aquí tu token de GitHub.</p>
-           <label class="campo">Token de GitHub
-             <input type="password" id="aj-token" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…">
-           </label>
-           <button class="boton" id="btn-token" type="button">Guardar token</button>`}
+        <p class="nota">Repositorio: ${esc(owner)}/${esc(repo)}</p>
+        ${formulario}
         <p id="aj-aviso" class="aviso" role="status">${estado.avisoCarga ? esc(estado.avisoCarga) : ''}</p>
         <p class="nota">El token se guarda solo en este navegador (no va a GitHub ni al código).
           Si pierdes el móvil o el ordenador, revócalo en GitHub y crea otro.</p>
-      </div>
-    </section>
 
-    <section class="tarjeta guia">
-      <header><strong>Cómo crear el token (una vez)</strong><small>Desde el ordenador es más cómodo</small></header>
-      <div class="cuerpo">
-        <ol>
-          <li>Entra en <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com › Settings › Developer settings › Personal access tokens › <b>Fine-grained tokens</b> › Generate new token</a>.</li>
-          <li><b>Token name</b>: por ejemplo <code>Continuidades – Mac</code> (o <code>– móvil</code>). Mejor un token por dispositivo.</li>
-          <li><b>Expiration</b>: 1 año (cuando caduque, se crea otro igual).</li>
-          <li><b>Repository access</b>: <i>Only select repositories</i> y elige <b>${esc(repo)}</b>. Solo ese.</li>
-          <li><b>Permissions › Repository permissions › Contents</b>: <i>Read and write</i>. Nada más (Metadata se pone solo en lectura).</li>
-          <li>Pulsa <b>Generate token</b> y copia el texto que empieza por <code>github_pat_</code>. GitHub solo lo enseña una vez.</li>
-          <li>Pégalo arriba y pulsa <b>Guardar token</b>. Aparecerá la pestaña <b>Editar</b>.</li>
-        </ol>
-        <p class="nota">En el móvil: crea el token desde el ordenador, envíatelo de forma privada (por ejemplo, con AirDrop o una nota),
-          pégalo aquí y después borra ese mensaje o nota.</p>
+        <details class="guia">
+          <summary>Cómo crear el token (una vez por dispositivo)</summary>
+          <ol>
+            <li>Desde el ordenador, entra en <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com › Settings › Developer settings › Personal access tokens › <b>Fine-grained tokens</b> › Generate new token</a>. Si Chrome traduce la página, pulsa «Mostrar original»: la traducción estropea el formulario.</li>
+            <li><b>Token name</b>: por ejemplo <code>Continuidades - Mac</code> o <code>Continuidades - móvil</code>.</li>
+            <li><b>Expiration</b>: como máximo 1 año. Al caducar, la app sigue consultándose, pero no guarda: se crea otro igual.</li>
+            <li><b>Repository access</b>: <i>Only select repositories</i> → <b>${esc(repo)}</b>. Solo ese.</li>
+            <li><b>Permissions</b> → <i>Add permissions</i> → <b>Contents</b> → <i>Read and write</i>. Nada más (Metadata se pone solo).</li>
+            <li>Pulsa <b>Generate token</b> y copia el texto que empieza por <code>github_pat_</code>. GitHub solo lo enseña una vez.</li>
+            <li>Pégalo arriba y pulsa <b>Guardar token</b>. Aparecerá la pestaña <b>Editar</b>.</li>
+          </ol>
+          <p class="nota">Para el móvil: créalo en el ordenador, pásalo de forma privada (AirDrop a Notas, por ejemplo),
+            pégalo aquí y borra la nota.</p>
+        </details>
       </div>
-    </section>`;
+    </details>`;
 }
 
 async function guardarTokenDesdeAjustes() {
@@ -606,12 +612,6 @@ function vistaInicio() {
       <p class="portada-texto">Registro de las <b>continuidades asistenciales extra</b> de Rafa (5 al mes) y Carlos (4 al mes)
         desde agosto de 2024: días realizados, <b>débitos</b> mensuales y acumulados, informe anual
         y el <b>escrito mensual a Gerencia</b> con los días y la previsión del mes siguiente.</p>
-      <div class="portada-accesos">
-        <a class="boton" href="#resumen">Ver resumen</a>
-        <a class="boton secundario" href="#historico">Histórico</a>
-        <a class="boton secundario" href="#informe">Informe anual</a>
-        <a class="boton secundario" href="#escrito">Escrito</a>
-      </div>
       <p class="nota">${act} <a href="#ayuda">Ayuda e historial de versiones</a></p>
       ${pie()}
     </section>`;
