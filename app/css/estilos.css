@@ -1,0 +1,172 @@
+/* Colores del Excel: azul marino, azul claro de cabeceras y rojo para los débitos. */
+:root {
+  --marino: #1F3864;
+  --marino-2: #2F5597;
+  --claro: #D9E2F3;
+  --claro-2: #EEF3FA;
+  --rojo: #C00000;
+  --verde: #2E7D32;
+  --texto: #1d2433;
+  --gris: #6b7280;
+  --borde: #c9d3e6;
+  --fondo: #f5f7fb;
+  --blanco: #fff;
+  --radio: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--texto);
+  background: var(--fondo);
+  padding-bottom: calc(68px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Cabecera ---------- */
+.cabecera {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: var(--marino); color: #fff;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+}
+.cabecera h1 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.cabecera h1 span { display: block; font-size: .75rem; font-weight: 400; opacity: .8; }
+.estado { font-size: .75rem; background: rgba(255,255,255,.15); padding: 3px 8px; border-radius: 99px; }
+.estado:empty { display: none; }
+
+main { max-width: 980px; margin: 0 auto; padding: 16px; }
+.cargando, .vacio { color: var(--gris); text-align: center; padding: 32px 0; }
+.error { background: #fdecea; color: var(--rojo); border-radius: var(--radio); padding: 12px 14px; }
+
+h2 { font-size: 1.15rem; margin: 0 0 12px; color: var(--marino); }
+h3 { font-size: 1rem; margin: 0 0 8px; color: var(--marino); }
+
+/* ---------- Pestañas (abajo en el móvil) ---------- */
+.pestanas {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; background: var(--blanco); border-top: 1px solid var(--borde);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pestanas a {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 2px; font-size: .68rem; color: var(--gris); text-decoration: none;
+}
+.pestanas a .ico { font-size: 1.15rem; line-height: 1; }
+.pestanas a.activa { color: var(--marino); font-weight: 700; }
+.pestanas a[hidden] { display: none; }
+
+@media (min-width: 760px) {
+  body { padding-bottom: 0; }
+  .pestanas {
+    position: sticky; top: 58px; bottom: auto; justify-content: center; gap: 4px;
+    border-top: 0; border-bottom: 1px solid var(--borde); padding: 0 16px;
+  }
+  .pestanas a { flex: 0 0 auto; flex-direction: row; gap: 6px; font-size: .9rem; padding: 12px 14px; border-bottom: 3px solid transparent; }
+  .pestanas a.activa { border-bottom-color: var(--marino); }
+}
+
+/* ---------- Controles ---------- */
+.barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+.barra label { font-size: .85rem; color: var(--gris); }
+select, input, button, textarea { font: inherit; }
+select, input[type=number], input[type=text], input[type=password], textarea {
+  border: 1px solid var(--borde); border-radius: 8px; padding: 8px 10px; background: var(--blanco); color: var(--texto);
+  min-height: 40px;
+}
+.boton {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 42px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--marino);
+  background: var(--marino); color: #fff; font-weight: 600; cursor: pointer; text-decoration: none;
+}
+.boton.secundario { background: var(--blanco); color: var(--marino); }
+.boton:disabled { opacity: .5; cursor: default; }
+
+/* ---------- Resumen ---------- */
+.tarjetas { display: grid; gap: 14px; }
+@media (min-width: 760px) { .tarjetas { grid-template-columns: 1fr 1fr; } }
+
+.tarjeta { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden; }
+.tarjeta > header { background: var(--marino); color: #fff; padding: 10px 14px; }
+.tarjeta > header strong { font-size: 1.05rem; }
+.tarjeta > header small { display: block; opacity: .8; font-size: .75rem; }
+.tarjeta .cuerpo { padding: 12px 14px; }
+
+.cifras { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
+.cifra { background: var(--claro-2); border-radius: 8px; padding: 8px 10px; }
+.cifra dt { font-size: .75rem; color: var(--gris); }
+.cifra dd { margin: 2px 0 0; font-size: 1.5rem; font-weight: 700; }
+.cifra.grande { grid-column: 1 / -1; background: var(--claro); }
+.cifra.grande dd { font-size: 2rem; }
+.cifra .nota { display: block; font-size: .72rem; font-weight: 400; color: var(--gris); }
+
+.debe { color: var(--rojo); }
+.favor { color: var(--verde); }
+
+.dias { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.dias li { background: var(--claro); border-radius: 99px; padding: 3px 10px; font-size: .85rem; }
+.dias li.aus { background: #fff4e5; color: #8a5300; }
+.abonado-hasta { margin-top: 12px; font-size: .9rem; }
+.abonado-hasta b { color: var(--verde); }
+
+/* ---------- Histórico ---------- */
+.lista-meses { display: grid; gap: 10px; }
+.mes { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); }
+.mes > h3 { margin: 0; padding: 8px 12px; background: var(--claro); border-radius: var(--radio) var(--radio) 0 0; display: flex; justify-content: space-between; }
+.mes > h3 small { font-weight: 400; color: var(--gris); font-size: .75rem; }
+.mes .personas { display: grid; grid-template-columns: 1fr 1fr; }
+.mes .persona { padding: 8px 12px; font-size: .88rem; }
+.mes .persona + .persona { border-left: 1px solid var(--borde); }
+.mes .persona b { display: block; color: var(--marino); }
+.mes .persona .linea { display: flex; justify-content: space-between; gap: 6px; }
+.mes .persona .linea span:first-child { color: var(--gris); }
+.check { color: var(--verde); font-weight: 700; }
+
+/* ---------- Informe anual ---------- */
+.informe { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 14px; }
+.informe .titulo { text-align: center; color: var(--marino); margin: 0 0 4px; font-size: 1.2rem; }
+.informe .subtitulo { text-align: center; color: var(--gris); margin: 0 0 14px; font-size: .85rem; }
+.informe-totales { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.informe-totales table { width: 100%; }
+.informe-cuerpo { display: grid; gap: 16px; }
+@media (min-width: 760px) { .informe-cuerpo { grid-template-columns: 1fr 1fr; } }
+
+table.excel { width: 100%; border-collapse: collapse; font-size: .82rem; }
+table.excel th, table.excel td { border: 1px solid var(--borde); padding: 3px 6px; text-align: center; }
+table.excel thead th { background: var(--marino); color: #fff; font-weight: 600; }
+table.excel thead tr.sub th { background: var(--claro); color: var(--marino); }
+table.excel td.mes-nombre { background: var(--claro-2); font-weight: 600; text-align: left; white-space: nowrap; }
+table.excel td.dia-sem { text-align: left; color: var(--gris); }
+table.excel tr.subtotal td { background: var(--claro); font-weight: 600; }
+table.excel tr.inicio-mes td { border-top: 2px solid var(--marino-2); }
+table.excel tfoot td { background: var(--marino); color: #fff; font-weight: 700; }
+table.excel tfoot td.debe { color: #ffb4b4; }
+
+.solo-pantalla { }
+
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  body { background: #fff; padding: 0; font-size: 11px; }
+  .cabecera, .pestanas, .barra, .solo-pantalla { display: none !important; }
+  main { max-width: none; padding: 0; }
+  .informe { border: 0; padding: 0; }
+  .informe-cuerpo { grid-template-columns: 1fr 1fr; }
+  table.excel { font-size: 9.5px; }
+  table.excel th, table.excel td { padding: 1px 4px; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* Informe en pantallas estrechas */
+.desplazable { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.desplazable table.excel { min-width: 440px; }
+table.excel .nw { white-space: nowrap; }
+table.excel.totales { max-width: 520px; margin: 0 auto 16px; }
+table.excel.totales td:not(.mes-nombre) { width: 18%; }
+table.excel.totales td.mes-nombre { white-space: normal; }
+@media (max-width: 480px) { .informe { padding: 10px; } .informe .titulo { font-size: 1.05rem; } }
+@media print { .desplazable { overflow: visible; } .desplazable table.excel { min-width: 0; } }
