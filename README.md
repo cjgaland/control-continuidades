@@ -6,6 +6,8 @@ Control de las continuidades asistenciales extra de Rafa y Carlos en el Hospital
 - `app/`: la aplicación (consulta desde el móvil u ordenador; Carlos introduce los datos).
 - `datos/continuidades.json`: los datos.
 - `docs/`: reglas de cálculo y modelo del escrito.
-- `excel/`: Excel histórico, que se usó hasta octubre de 2026.
+- El Excel histórico (usado hasta octubre de 2026) y los escritos de ejemplo están en Google Drive, no aquí.
+- App publicada: https://cjgaland.github.io/control-continuidades/
+- Tests: `npm test`. Probar en local: `node scripts/servidor.mjs` y abrir http://127.0.0.1:8765/app/
 
 Los escritos enviados a Gerencia se archivan en PDF en Google Drive (`Control Continuidades/Escritos`).

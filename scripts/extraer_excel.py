@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Extrae los datos introducidos a mano en el Excel de continuidades
-(excel/Continuidades_calidad_2024-2030.xlsx) y los guarda en datos/continuidades.json.
+(en Google Drive: Mi unidad/Control Continuidades/Excel histórico/) y los guarda en datos/continuidades.json.
+Ya no hace falta: desde octubre de 2026 los datos se editan en la app.
 
 Solo lee las ENTRADAS (días, V/B y casillas de abonado), no las fórmulas:
 los débitos se recalculan en la app con las reglas de docs/reglas-de-calculo.md.
@@ -14,7 +15,8 @@ from pathlib import Path
 import openpyxl
 
 RAIZ = Path(__file__).resolve().parent.parent
-XLSX = Path(sys.argv[1]) if len(sys.argv) > 1 else RAIZ / "excel" / "Continuidades_calidad_2024-2030.xlsx"
+XLSX = Path(sys.argv[1]) if len(sys.argv) > 1 else (Path.home() / "Library/CloudStorage/GoogleDrive-cjgaland@gmail.com"
+    / "Mi unidad/Control Continuidades/Excel histórico/Continuidades_calidad_2024-2030.xlsx")
 OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else RAIZ / "datos" / "continuidades.json"
 
 # Cada mes ocupa 6 filas: 5 filas de días (a..a+4) y la fila de subtotal (a+5).

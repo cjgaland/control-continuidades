@@ -2,3 +2,8 @@
 Backup/
 .env*
 node_modules/
+
+# Archivo histórico: vive en Google Drive (Mi unidad/Control Continuidades), no en el repositorio público
+excel/
+*.xlsx
+*.pdf

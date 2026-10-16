@@ -5,7 +5,7 @@ Control de las **continuidades asistenciales extra** que hacen **Rafa** (Rafael 
 responsable de la Unidad de Calidad y Seguridad del Paciente) y **Carlos** (Carlos J. Galán Doval)
 en el Hospital Comarcal de Montilla (Área de Gestión Sanitaria Sur de Córdoba, SAS).
 Por un acuerdo personal con Gerencia, a Rafa le corresponden **5** continuidades al mes y a Carlos **4**.
-El control empezó en **agosto de 2024**. Hasta ahora se llevaba con un Excel (`excel/`), que se sustituye por una app web sencilla.
+El control empezó en **agosto de 2024**. Hasta octubre de 2026 se llevaba con un Excel, que se sustituye por una app web sencilla.
 
 ## Usuarios y forma de trabajar
 - **Carlos** es el único que introduce datos (de momento). Edita **desde la propia app**, en el Mac o en el móvil, y usa Claude Code para el desarrollo.
@@ -17,7 +17,8 @@ El control empezó en **agosto de 2024**. Hasta ahora se llevaba con un Excel (`
 |---|---|---|
 | Código de la app, documentación y scripts | **GitHub** (repositorio de Carlos) | Control de versiones; Claude Code hace los commits y los push cuando Carlos lo pide |
 | Datos (`datos/continuidades.json`) | **GitHub**, junto a la app | La app los carga al instante; un archivo pequeño (unos pocos KB) |
-| App publicada | **GitHub Pages** | Para abrirla desde el móvil y el ordenador |
+| App publicada | **GitHub Pages**: https://cjgaland.github.io/control-continuidades/ | Para abrirla desde el móvil y el ordenador |
+| **Excel histórico y escritos de ejemplo** | **Google Drive** de Carlos: `Mi unidad/Control Continuidades/Excel histórico/` y `Escritos/ejemplos/` | El repositorio es **público**: lo que no debe verse no se sube a GitHub |
 | **Archivo histórico de escritos (PDF)** | **Google Drive** de Carlos: `Mi unidad/Control Continuidades/Escritos/<año>/` | Mucho espacio y fácil de consultar desde la app de Drive; se comparte con Rafa como lector |
 
 La app **no lee nada de Drive**, así que Drive no la ralentiza. Drive solo recibe los PDF ya terminados.
@@ -36,17 +37,19 @@ La app **no lee nada de Drive**, así que Drive no la ralentiza. Drive solo reci
 ## Documentación (leer antes de programar)
 - `docs/reglas-de-calculo.md` — cupos, débito mensual y acumulados, vacaciones y bajas, abonado, validaciones y **cifras de control para tests**.
 - `docs/modelo-escrito.md` — formato exacto del escrito, destinatarios, ejemplo generado y errores que hay que evitar.
-- `docs/ejemplos-escritos/*.pdf` — escritos reales enviados (referencia de estilo).
+- Escritos reales enviados (referencia de estilo): en Drive, `Mi unidad/Control Continuidades/Escritos/ejemplos/`.
 - `datos/continuidades.json` — **fuente de verdad** de los datos (extraída del Excel con `scripts/extraer_excel.py`).
-- `excel/Continuidades_calidad_2024-2030.xlsx` — Excel histórico (solo como archivo; ya no se edita).
+- Excel histórico (solo como archivo; ya no se edita): en Drive, `Mi unidad/Control Continuidades/Excel histórico/`.
+  En el Mac: `~/Library/CloudStorage/GoogleDrive-cjgaland@gmail.com/Mi unidad/Control Continuidades/`.
 
 ## Estructura del repositorio
 ```
 app/        App web: index.html, css/, js/ (sin frameworks ni compilación)
 datos/      continuidades.json — el único sitio donde se guardan los datos
 docs/       Reglas, modelo del escrito y ejemplos
-excel/      Excel histórico
-scripts/    Utilidades (extraer_excel.py)
+scripts/    Utilidades (extraer_excel.py, servidor.mjs para probar en local)
+tests/      Tests (npm test)
+index.html  Portada que redirige a app/ (GitHub Pages publica la raíz del repositorio)
 ```
 Los escritos en PDF **no** se guardan en el repositorio, van a Google Drive.
 
@@ -85,8 +88,10 @@ Los escritos en PDF **no** se guardan en el repositorio, van a Google Drive.
 - El correo no se envía desde la app: un `mailto:` abre el correo ya rellenado (Para, CCO, Asunto y Cuerpo) y además hay un botón "Copiar texto".
 
 ## Privacidad
-Con GitHub Pages, la app publicada (y el JSON que carga) puede verla **cualquiera que tenga el enlace**,
-aunque el repositorio sea privado. Los datos son de baja sensibilidad (días de continuidad de dos
-profesionales), pero esto **lo decide Carlos**: confírmalo con él antes de activar Pages.
+**Decisión de Carlos (16-10-2026):** el repositorio `cjgaland/control-continuidades` es **público** y Pages
+publica la raíz. Cualquiera puede ver el código, la documentación, los datos y los correos corporativos
+de los destinatarios (necesarios para el `mailto:`). Son datos de baja sensibilidad.
+El Excel y los escritos reales **no** van al repositorio (están en Drive, compartidos solo con Rafa);
+`.gitignore` bloquea `*.xlsx` y `*.pdf`. No subas nada personal o sensible sin preguntar.
 Los PDF de los escritos no se publican, solo están en Drive.
 El token de edición **nunca** va al código ni a un commit. Si se pierde un dispositivo, se revoca el token en GitHub.

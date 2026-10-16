@@ -90,7 +90,7 @@ Carlos:
 
 ## Ejemplos reales enviados
 
-En `docs/ejemplos-escritos/` están los PDF de cuatro escritos enviados de verdad (2025 y 2026).
+En Google Drive (`Mi unidad/Control Continuidades/Escritos/ejemplos/`) están los PDF de cuatro escritos enviados de verdad (2025 y 2026).
 Sirven de **referencia de estilo**, pero tienen errores hechos a mano que la app debe evitar:
 días de la semana equivocados, "Solicitados" que no cuadra con los días de la lista
 y un "Día 31" en noviembre.
