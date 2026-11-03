@@ -531,7 +531,7 @@
           15
         ],
         "ausencia": null,
-        "abonado": false
+        "abonado": true
       },
       "carlos": {
         "dias": [
@@ -541,7 +541,7 @@
           30
         ],
         "ausencia": null,
-        "abonado": false
+        "abonado": true
       }
     },
     "2026-10": {
@@ -586,5 +586,5 @@
       }
     }
   },
-  "actualizado": "2026-10-16"
+  "actualizado": "2026-11-03"
 }
