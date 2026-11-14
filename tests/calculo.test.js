@@ -7,7 +7,11 @@ import {
   diaSemana, diasEnMes, validarRegistro, mesTerminado, partirClave,
 } from '../app/js/calculo.js';
 
-const datos = JSON.parse(readFileSync(new URL('../datos/continuidades.json', import.meta.url)));
+// Foto de los datos del 16-10-2026: las cifras de control de los documentos se calcularon con ella. No se toca;
+// así los tests no cambian cada vez que la app abona o añade un mes en datos/continuidades.json.
+const datos = JSON.parse(readFileSync(new URL('./datos/continuidades_16-10-2026.json', import.meta.url)));
+// Los datos reales de la app (solo para comprobar que todo lo guardado es válido).
+const datosReales = JSON.parse(readFileSync(new URL('../datos/continuidades.json', import.meta.url)));
 const HOY = '2026-10-16';
 
 test('Rafa: débito anual 2024 = 7, 2025 = 32, 2026 (ene–oct) = 21', () => {
@@ -87,7 +91,7 @@ test('Validación: día inexistente, repetidos y más de 5', () => {
 });
 
 test('Todos los datos guardados son válidos', () => {
-  for (const [clave, mes] of Object.entries(datos.meses)) {
+  for (const [clave, mes] of Object.entries(datosReales.meses)) {
     const { anio, mes: m } = partirClave(clave);
     for (const persona of ['rafa', 'carlos']) {
       if (mes[persona]) assert.deepEqual(validarRegistro(anio, m, mes[persona]), [], `${clave} ${persona}`);

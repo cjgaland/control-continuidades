@@ -48,7 +48,8 @@ app/        App web: index.html, css/, js/ (sin frameworks ni compilación)
 datos/      continuidades.json — el único sitio donde se guardan los datos
 docs/       Reglas, modelo del escrito y ejemplos
 scripts/    Utilidades (extraer_excel.py, servidor.mjs para probar en local, nueva-version.mjs)
-tests/      Tests (npm test)
+tests/      Tests (npm test). Los de cálculo y escrito usan la foto fija tests/datos/continuidades_16-10-2026.json
+            (las cifras de control de docs/); solo «Todos los datos guardados son válidos» lee los datos reales.
 index.html  Redirige a app/ (GitHub Pages publica la raíz del repositorio)
 Backup/     Copias de seguridad locales (no se suben a GitHub)
 ```

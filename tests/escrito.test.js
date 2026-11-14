@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { generarEscrito, asuntoEscrito, nombrePdf, formatoDebito, enlaceCorreo, propuestaEscrito } from '../app/js/escrito.js';
 
-const datos = JSON.parse(readFileSync(new URL('../datos/continuidades.json', import.meta.url)));
+// Foto de los datos del 16-10-2026: las cifras de control de los documentos se calcularon con ella. No se toca;
+// así los tests no cambian cada vez que la app abona o añade un mes en datos/continuidades.json.
+const datos = JSON.parse(readFileSync(new URL('./datos/continuidades_16-10-2026.json', import.meta.url)));
 const modelo = readFileSync(new URL('../docs/modelo-escrito.md', import.meta.url), 'utf8');
 const HOY = '2026-10-16';
 const OPC = { primerMes: '2026-09', numMeses: 3, prevision: true, saludo: 'Buenos días' };
