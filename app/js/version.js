@@ -1,11 +1,16 @@
 // Versión de la app e historial de cambios (se muestra en la portada y en Ayuda).
 // Para publicar una versión nueva: node scripts/nueva-version.mjs 1.2 "Qué cambia"
 
-export const VERSION = '1.4';
+export const VERSION = '1.5';
 export const ANIO = 2026;
 export const AUTOR = 'Carlos J. Galán Doval';
 
 export const HISTORIAL = [
+  {
+    version: '1.5',
+    fecha: '14-11-2026',
+    cambios: 'En ordenador, cada pantalla cabe entera sin desplazar la página: pestañas arriba, informe en tres columnas, escrito con el texto a toda altura y Rafa y Carlos lado a lado al editar',
+  },
   {
     version: '1.4',
     fecha: '16-10-2026',

@@ -288,3 +288,144 @@ details.guia > summary { cursor: pointer; color: var(--marino); font-weight: 600
 .leyenda-tira span { display: inline-flex; align-items: center; gap: 5px; }
 .leyenda-tira i.mes-tira { width: 14px; height: 14px; border-radius: 3px; }
 @media print { .informe-resumen { grid-template-columns: 1fr 1fr; } }
+
+/* ---------- Ordenador: cada pantalla cabe entera en la ventana, sin desplazar la página ----------
+   Solo se desplaza la caja que lo necesite (histórico, ayuda, informe…). Nada de esto afecta al móvil ni a imprimir. */
+@media screen and (min-width: 1000px) {
+  html, body { height: 100dvh; }
+  body { overflow: hidden; display: flex; flex-direction: column; padding-bottom: 0; }
+  .cabecera { position: static; order: 1; flex: none; padding-top: 8px; padding-bottom: 8px; }
+  .pestanas { position: static; order: 2; flex: none; }
+  .aviso-cambios { position: static; order: 3; flex: none; }
+  main {
+    order: 4; flex: 1 1 auto; min-height: 0; width: 100%; max-width: 1760px;
+    overflow: auto; padding: 10px 20px 14px;
+  }
+  main > h2 { margin: 0 0 8px; }
+  main > .barra { margin: 0; }
+
+  /* Pantallas con título + selector en una línea y una caja que ocupa el resto */
+  main[data-vista=resumen], main[data-vista=historico], main[data-vista=informe], main[data-vista=editar] {
+    display: grid; grid-template-columns: auto auto auto 1fr; grid-template-rows: auto minmax(0, 1fr);
+    align-items: center; overflow: hidden;
+  }
+  main[data-vista=resumen] > h2, main[data-vista=historico] > h2, main[data-vista=informe] > h2, main[data-vista=editar] > h2 { margin: 0 20px 8px 0; }
+  main[data-vista=informe] > .barra { margin-right: 12px; }
+  main[data-vista=informe] > .botones-informe { margin: 0 12px 0 0; }
+  main[data-vista=informe] > .aviso { margin: 0; min-height: 0; }
+  main[data-vista=resumen] > .tarjetas, main[data-vista=historico] > .lista-meses, main[data-vista=informe] > .informe,
+  main[data-vista=editar] > .tarjetas { grid-column: 1 / -1; align-self: stretch; min-height: 0; overflow: auto; }
+  main[data-vista=editar] > .tarjetas { align-content: start; }
+  /* Resumen: las dos tarjetas ocupan toda la altura y las cifras crecen con ella */
+  main[data-vista=resumen] > .tarjetas { align-items: stretch; }
+  main[data-vista=resumen] .tarjeta { display: flex; flex-direction: column; margin-top: 0; }
+  main[data-vista=resumen] .tarjeta .cuerpo { flex: 1; display: flex; flex-direction: column; }
+  main[data-vista=resumen] .cifras { flex: 1; grid-template-rows: 1.4fr 1fr; align-content: stretch; }
+  main[data-vista=resumen] .cifra { display: flex; flex-direction: column; justify-content: center; }
+  main[data-vista=resumen] .cifra dd { font-size: clamp(1.4rem, 4.2vh, 2.6rem); }
+  main[data-vista=resumen] .cifra.grande dd { font-size: clamp(1.8rem, 6.5vh, 3.8rem); }
+  main[data-vista=resumen] .dias { margin-top: 14px; }
+  main[data-vista=resumen] .dias li { font-size: .95rem; }
+
+  /* Resumen: las cuatro cifras pequeñas en una fila */
+  .cifras { grid-template-columns: repeat(4, 1fr); }
+  .cifra.grande { grid-column: 1 / -1; }
+
+  /* Histórico: tantas columnas como quepan; se desplaza solo la lista */
+  .lista-meses { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-content: start; }
+
+  /* Informe: Rafa | Carlos | totales y resumen del año */
+  .informe {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(290px, .7fr);
+    column-gap: 14px; row-gap: 6px; align-content: start; padding: 10px 14px;
+  }
+  .informe .titulo, .informe .subtitulo { grid-column: 1 / -1; margin: 0; font-size: 1.05rem; }
+  .informe .subtitulo { font-size: .8rem; margin-bottom: 4px; }
+  .informe-cuerpo, .informe-resumen { display: contents; }
+  .informe-cuerpo > .desplazable:nth-child(1) { grid-column: 1; grid-row: 3 / span 4; }
+  .informe-cuerpo > .desplazable:nth-child(2) { grid-column: 2; grid-row: 3 / span 4; }
+  .informe table.excel.totales { grid-column: 3; grid-row: 3; max-width: none; margin: 0; }
+  .informe-resumen > .resumen-anual:nth-child(1) { grid-column: 3; grid-row: 4; }
+  .informe-resumen > .resumen-anual:nth-child(2) { grid-column: 3; grid-row: 5; }
+  .informe .leyenda-tira { grid-column: 3; grid-row: 6; margin: 0; }
+  .informe .desplazable table.excel { min-width: 0; }
+
+  /* Escrito: opciones y botones a la izquierda, el texto ocupa toda la columna derecha */
+  main[data-vista=escrito] {
+    display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); grid-template-rows: repeat(6, auto) 1fr;
+    column-gap: 20px; align-content: start; overflow: hidden;
+  }
+  main[data-vista=escrito] > :not(.texto-escrito) { grid-column: 1; }
+  main[data-vista=escrito] > .formulario { grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
+  main[data-vista=escrito] > .texto-escrito { grid-column: 2; grid-row: 1 / -1; height: 100%; min-height: 0; resize: none; contain: size; }
+  main[data-vista=escrito] > .botones { display: grid; grid-template-columns: 1fr 1fr; }
+
+  /* Editar */
+  main[data-vista=editar] > .tarjetas { grid-template-columns: 1fr 1fr; }
+  main[data-vista=editar] > .botones, main[data-vista=editar] > .aviso, main[data-vista=editar] > .nota { grid-column: 1 / -1; align-self: start; }
+  main[data-vista=editar] { grid-template-rows: auto minmax(0, auto) auto auto auto; align-content: start; }
+  main .tarjetas > .tarjeta + .tarjeta { margin-top: 0; }
+  main[data-vista=editar] > .tarjetas { align-items: start; }
+  main[data-vista=editar] > .botones { margin-top: 8px; }
+  main[data-vista=editar] > .aviso { min-height: 1.2em; }
+  .dias-editor { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+
+  /* Ayuda en columnas; se desplaza solo la tarjeta */
+  main[data-vista=ayuda] { display: flex; flex-direction: column; overflow: hidden; }
+  main[data-vista=ayuda] > .tarjeta { flex: 1; min-height: 0; overflow: auto; }
+  .ayuda .cuerpo { column-width: 380px; column-gap: 32px; }
+  .ayuda h3 { break-after: avoid; }
+  .ayuda li, .ayuda p { break-inside: avoid; }
+  .ayuda h3:first-child { margin-top: 0; }
+
+  /* Ajustes: la guía en dos columnas */
+  details.guia ol { columns: 2 360px; column-gap: 28px; }
+  details.guia li { break-inside: avoid; }
+
+  /* Portada */
+  main[data-vista=inicio] { display: flex; flex-direction: column; justify-content: center; }
+  main[data-vista=inicio] .portada { margin: 0 auto; }
+}
+
+/* Portátiles con poca altura: se compacta antes de desplazar */
+@media screen and (min-width: 1000px) and (max-height: 820px) {
+  .cabecera { padding-top: 5px; padding-bottom: 5px; }
+  .cabecera h1 { font-size: 1rem; }
+  .marca img { width: 28px; height: 28px; }
+  .pestanas a { padding-top: 7px; padding-bottom: 7px; }
+  main { padding: 6px 16px 8px; }
+  h2 { font-size: 1.05rem; }
+  main > h2 { margin-bottom: 6px; }
+  select, input[type=number], input[type=text], input[type=password], textarea { min-height: 34px; padding: 5px 9px; }
+  .boton { min-height: 36px; padding: 5px 14px; }
+  .tarjeta > header { padding: 7px 12px; }
+  .tarjeta .cuerpo { padding: 9px 12px; }
+  .cifra { padding: 5px 9px; }
+  .cifra dd { font-size: 1.3rem; }
+  .cifra.grande dd { font-size: 1.6rem; }
+  .dias { margin-top: 8px; }
+  .abonado-hasta { margin-top: 8px; }
+  .informe { padding: 5px 12px; row-gap: 3px; }
+  .informe .titulo { font-size: .98rem; }
+  table.excel { font-size: .74rem; }
+  table.excel th, table.excel td { padding: 1px 5px; }
+  .resumen-anual { padding: 6px 10px; }
+  .resumen-anual h4 { margin-bottom: 4px; }
+  .cifras-anuales b { font-size: 1.2rem; }
+  .tira { margin-top: 6px; }
+  .leyenda-tira { font-size: .7rem; gap: 2px 10px; }
+  .formulario label.casilla { font-size: .88rem; }
+  .campo-dia input { min-height: 32px; }
+  fieldset.editor { gap: 6px; padding-bottom: 8px; }
+  fieldset.editor legend { margin-top: 6px; }
+  .dias-editor { gap: 4px; }
+  .portada-logo { width: 84px; height: 84px; border-radius: 18px; }
+  .portada h2 { margin: 8px 0 2px; font-size: 1.3rem; }
+  .portada-texto { padding: 10px 14px; margin-bottom: 10px; }
+  .autoria { margin: 10px 0 0; }
+  .mes .persona { padding: 6px 10px; }
+  .ayuda .cuerpo { font-size: .88rem; line-height: 1.32; }
+  .ayuda h3 { margin: 10px 0 4px; font-size: .95rem; }
+  .ayuda li { margin-bottom: 3px; }
+  .ayuda ul { margin: 4px 0; }
+}

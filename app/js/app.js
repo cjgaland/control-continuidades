@@ -4,16 +4,16 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS, resumenAnual,
-} from './calculo.js?v=1.4';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.4';
+} from './calculo.js?v=1.5';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.5';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.4';
+} from './github.js?v=1.5';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.4';
-import { crearPdf, crearPdfInforme } from './pdf.js?v=1.4';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.4';
+} from './escrito.js?v=1.5';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=1.5';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.5';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -878,6 +878,7 @@ function vistaActual() {
 function pintar() {
   const v = vistaActual();
   document.querySelectorAll('#pestanas a').forEach((a) => a.classList.toggle('activa', a.dataset.vista === v));
+  $contenido.dataset.vista = v;
   $contenido.innerHTML = VISTAS[v]();
   if (v === 'editar') refrescarEditor();
 }
