@@ -4,17 +4,17 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS, resumenAnual,
-} from './calculo.js?v=1.6';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.6';
+} from './calculo.js?v=1.7';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.7';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.6';
+} from './github.js?v=1.7';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.6';
-import { crearPdf, crearPdfInforme } from './pdf.js?v=1.6';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.6';
-import { htmlManual, pintarManual } from './ayuda.js?v=1.6';
+} from './escrito.js?v=1.7';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=1.7';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.7';
+import { htmlManual, pintarManual } from './ayuda.js?v=1.7';
 
 const URL_DATOS = '../datos/continuidades.json';
 
