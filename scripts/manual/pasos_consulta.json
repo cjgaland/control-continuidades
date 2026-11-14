@@ -17,6 +17,11 @@
   "foto": "c01_portada"
  },
  {
+  "foto": "c10_cabecera",
+  "selector": ".cabecera",
+  "margen": 0
+ },
+ {
   "url": "/app/#resumen"
  },
  {

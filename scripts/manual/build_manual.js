@@ -17,7 +17,7 @@ const APP = {
   nombreCorto: 'Control de Continuidades',
   organizacion: ['Unidad de Calidad y Seguridad del Paciente', 'Hospital Comarcal de Montilla', 'Área de Gestión Sanitaria Sur de Córdoba'],
   autor: 'Carlos J. Galán Doval',
-  version: '1.0',
+  version: '1.1',
   fecha: 'noviembre 2026',
 };
 const PALETA = {
@@ -57,7 +57,10 @@ const CAPITULOS = [
     bloques: [
       { h: 'Cómo se abre', parrafos: ['Es una página web: se abre desde el navegador (Chrome, Safari, Edge…) en el ordenador o en el móvil, con el enlace que te haya pasado Carlos. Guárdala en **Favoritos** o en la pantalla de inicio del móvil (capítulo 3).'] },
       { h: 'La portada', parrafos: ['Al entrar ves la portada: qué es la aplicación y cuándo se actualizaron los datos por última vez (por ejemplo, «Datos actualizados el 12/11/2026»). Desde ahí se llega a la **Ayuda** con el botón **?** de arriba a la derecha.'],
-        imagen: fig('c01_portada.png', 'La portada (ordenador). Arriba, el botón ? de Ayuda; en la barra, las pantallas.') },
+        imagen: fig('c01_portada.png', 'La portada (ordenador). Arriba, el botón Portal y el botón ? de Ayuda; en la barra, las pantallas.') },
+      { h: 'La cabecera: el botón Portal', parrafos: ['En la franja azul de arriba, a la derecha, hay dos botones: **⌂ Portal** y **?** (Ayuda). Esta versión de la aplicación es la **1.7**.',
+        '**⌂ Portal** abre, en **otra pestaña**, el Portal de la Unidad de Calidad: la página que reúne todas las herramientas de la Unidad (Actividad, Dietas, Permisos, Continuidades…). La aplicación sigue abierta donde estaba, así que puedes volver sin perder nada. El Portal está protegido con acceso por correo: si tu correo no tiene permiso, verás la pantalla de inicio de sesión de Cloudflare y no podrás pasar.'],
+        imagen: fig('c10_cabecera.png', 'La cabecera con el botón Portal (a la izquierda del ?).', 560) },
       { h: 'Las pestañas', parrafos: ['Las pantallas se cambian con las pestañas: **Resumen**, **Histórico**, **Informe**, **Escrito** y **Ajustes**. En el ordenador están arriba; en el móvil, abajo, siempre a mano. Quien tiene el Modo edición ve además la pestaña **Editar**.'] },
       { h: 'El aviso «Actualizar»', parrafos: [
         'La aplicación mira cada minuto si hay datos nuevos o una versión nueva. Si la dejas abierta y alguien guarda un cambio, arriba aparece una franja con el texto **«Se han guardado datos nuevos»** (o «Hay una versión nueva de la app») y el botón **Actualizar**.',
@@ -284,6 +287,7 @@ const CAPITULOS = [
 ];
 
 const FAQ = [
+  { p: '¿Qué es el botón Portal?', r: 'El botón «⌂ Portal» de la cabecera abre, en otra pestaña, el Portal de la Unidad de Calidad, con todas las herramientas de la Unidad (Actividad, Dietas, Permisos, Continuidades…). Está protegido con acceso por correo: si tu correo no tiene permiso, saldrá la pantalla de inicio de sesión de Cloudflare. Esta aplicación sigue abierta en su pestaña.' },
   { p: '¿Qué es el débito?', r: 'Es lo que falta para llegar al cupo del mes: el cupo menos los días hechos. Si Rafa (cupo 5) hace 3 días, su débito del mes es 2. Los débitos se suman mes a mes en los acumulados. Rojo significa que se debe; un número con + en verde, que se han hecho de más.' },
   { p: '¿Por qué un mes sale como «previsión»?', r: 'Porque todavía no ha terminado. Se anotan por adelantado los días que se piensan hacer para que Gerencia los conozca. Cuando el mes acaba, deja de ser previsión sin que nadie tenga que hacer nada.' },
   { p: '¿Qué significa «abonado»?', r: 'Que Gerencia ha dado el visto bueno y los días de ese mes ya se han pagado. Cada persona tiene su propia marca (✓). «Abonado hasta» es el último mes abonado de cada una.' },
