@@ -1,0 +1,94 @@
+[
+ {
+  "viewport": {
+   "w": 1440,
+   "h": 900
+  }
+ },
+ {
+  "url": "/app/#inicio",
+  "js": "localStorage.removeItem('continuidades.token');",
+  "espera": 300
+ },
+ {
+  "url": "/app/#inicio"
+ },
+ {
+  "foto": "c01_portada"
+ },
+ {
+  "url": "/app/#resumen"
+ },
+ {
+  "foto": "c02_resumen"
+ },
+ {
+  "js": "const s=document.getElementById('sel-mes'); s.value='2026-12'; s.dispatchEvent(new Event('change',{bubbles:true}));"
+ },
+ {
+  "foto": "c03_resumen_prevision"
+ },
+ {
+  "url": "/app/#historico"
+ },
+ {
+  "js": "const s=document.getElementById('sel-anio-h'); s.value='2025'; s.dispatchEvent(new Event('change',{bubbles:true}));"
+ },
+ {
+  "foto": "c04_historico"
+ },
+ {
+  "url": "/app/#informe"
+ },
+ {
+  "foto": "c05_informe"
+ },
+ {
+  "foto": "c06_informe_resumen",
+  "selector": ".informe-resumen",
+  "margen": 10
+ },
+ {
+  "url": "/app/#escrito"
+ },
+ {
+  "foto": "c07_escrito"
+ },
+ {
+  "url": "/app/#ajustes"
+ },
+ {
+  "foto": "c08_ajustes"
+ },
+ {
+  "url": "/app/#ayuda"
+ },
+ {
+  "foto": "c09_ayuda"
+ },
+ {
+  "viewport": {
+   "w": 390,
+   "h": 844,
+   "movil": true
+  }
+ },
+ {
+  "url": "/app/#resumen"
+ },
+ {
+  "foto": "m01_resumen"
+ },
+ {
+  "url": "/app/#historico"
+ },
+ {
+  "foto": "m02_historico"
+ },
+ {
+  "url": "/app/#escrito"
+ },
+ {
+  "foto": "m03_escrito"
+ }
+]

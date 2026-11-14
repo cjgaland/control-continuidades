@@ -7,3 +7,10 @@ node_modules/
 excel/
 *.xlsx
 *.pdf
+
+# Excepción: los manuales de usuario (PDF) sí se publican
+!app/ayuda/*.pdf
+!docs/Manual_*.pdf
+
+# Capturas del generador de manuales (datos de demostración, se regeneran)
+scripts/manual/capturas/

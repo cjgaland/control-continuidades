@@ -1,0 +1,115 @@
+[
+ {
+  "viewport": {
+   "w": 1440,
+   "h": 900
+  }
+ },
+ {
+  "url": "/app/#inicio",
+  "js": "localStorage.removeItem('continuidades.token');",
+  "espera": 300
+ },
+ {
+  "url": "/app/#ajustes"
+ },
+ {
+  "js": "document.querySelector('details.plegable').open=true; document.getElementById('aj-token').value='github_pat_11FALSO00000000000000000000'; document.getElementById('aj-token').scrollIntoView({block:'center'});"
+ },
+ {
+  "foto": "e01_ajustes_token"
+ },
+ {
+  "js": "localStorage.setItem('continuidades.token','github_pat_FALSO_solo_para_capturas');",
+  "espera": 200
+ },
+ {
+  "url": "/app/#ajustes"
+ },
+ {
+  "foto": "e02_ajustes_con_token"
+ },
+ {
+  "url": "/app/#resumen"
+ },
+ {
+  "foto": "e03_resumen_modo_edicion"
+ },
+ {
+  "url": "/app/#editar"
+ },
+ {
+  "foto": "e04_editar"
+ },
+ {
+  "js": "const s=document.getElementById('ed-mes'); s.value='2026-12'; s.dispatchEvent(new Event('change',{bubbles:true}));"
+ },
+ {
+  "js": "document.querySelectorAll('.ed-dia').forEach(e=>{e.value='';e.dispatchEvent(new Event('input',{bubbles:true}));});"
+ },
+ {
+  "foto": "e05_editar_mes_vacio"
+ },
+ {
+  "js": "{const e=document.querySelector('.ed-dia[data-p=\"rafa\"][data-i=\"0\"]'); e.value='1'; e.dispatchEvent(new Event('input',{bubbles:true}));} {const e=document.querySelector('.ed-dia[data-p=\"rafa\"][data-i=\"1\"]'); e.value='9'; e.dispatchEvent(new Event('input',{bubbles:true}));} {const e=document.querySelector('.ed-dia[data-p=\"rafa\"][data-i=\"2\"]'); e.value='15'; e.dispatchEvent(new Event('input',{bubbles:true}));} {const e=document.querySelector('.ed-dia[data-p=\"rafa\"][data-i=\"3\"]'); e.value='22'; e.dispatchEvent(new Event('input',{bubbles:true}));} {const e=document.querySelector('.ed-dia[data-p=\"carlos\"][data-i=\"0\"]'); e.value='2'; e.dispatchEvent(new Event('input',{bubbles:true}));} {const e=document.querySelector('.ed-dia[data-p=\"carlos\"][data-i=\"1\"]'); e.value='10'; e.dispatchEvent(new Event('input',{bubbles:true}));} {const e=document.querySelector('.ed-dia[data-p=\"carlos\"][data-i=\"2\"]'); e.value='16'; e.dispatchEvent(new Event('input',{bubbles:true}));} {const e=document.querySelector('.ed-dia[data-p=\"carlos\"][data-i=\"3\"]'); e.value='23'; e.dispatchEvent(new Event('input',{bubbles:true}));}"
+ },
+ {
+  "foto": "e06_editar_con_dias"
+ },
+ {
+  "url": "/app/#editar"
+ },
+ {
+  "js": "{const e=document.querySelector('.ed-dia[data-p=\"rafa\"][data-i=\"3\"]'); e.value='31'; e.dispatchEvent(new Event('input',{bubbles:true}));}{const e=document.querySelector('.ed-dia[data-p=\"carlos\"][data-i=\"4\"]'); e.value='4'; e.dispatchEvent(new Event('input',{bubbles:true}));}"
+ },
+ {
+  "foto": "e07_editar_errores"
+ },
+ {
+  "url": "/app/#editar"
+ },
+ {
+  "js": "const s=document.getElementById('ed-mes'); s.value='2026-08'; s.dispatchEvent(new Event('change',{bubbles:true}));"
+ },
+ {
+  "foto": "e08_editar_vacaciones"
+ },
+ {
+  "url": "/app/#editar"
+ },
+ {
+  "js": "const s=document.getElementById('ed-mes'); s.value='2026-10'; s.dispatchEvent(new Event('change',{bubbles:true}));"
+ },
+ {
+  "js": "const c=document.querySelector('.ed-abonado[data-p=\"rafa\"]'); c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));"
+ },
+ {
+  "foto": "e09_editar_abonado"
+ },
+ {
+  "js": "document.getElementById('btn-guardar').click();",
+  "espera": 1200
+ },
+ {
+  "foto": "e10_guardado"
+ },
+ {
+  "viewport": {
+   "w": 390,
+   "h": 844,
+   "movil": true
+  }
+ },
+ {
+  "url": "/app/#editar"
+ },
+ {
+  "foto": "em01_editar"
+ },
+ {
+  "url": "/app/#ajustes"
+ },
+ {
+  "foto": "em02_ajustes"
+ }
+]

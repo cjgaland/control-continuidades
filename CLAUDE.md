@@ -106,6 +106,13 @@ El token de edición **nunca** va al código ni a un commit. Si se pierde un dis
 - La app comprueba cada minuto (y al volver a la pestaña) si hay versión nueva o datos nuevos, y muestra un aviso
   con el botón «Actualizar». No hay service worker, a propósito (dio problemas en otras apps).
 
+## Manual de usuario
+- Dos manuales, en Word y PDF: **consulta** (`Manual_Control_Continuidades`) y **Modo edición** (`..._Edicion`, superconjunto con lo exclusivo marcado en morado).
+  Word y PDF en `docs/`, PDF también en `app/ayuda/` (los que descarga el botón «Descargar manual (PDF)» de Ayuda y Ajustes; en Modo edición lleva al de edición; lógica en `app/js/ayuda.js`).
+- Se generan con `scripts/manual/` (ver su `LEEME.md`): capturas de una demo con datos INVENTADOS (nunca los reales), luego `bash scripts/manual/generar.sh`.
+- **Al cambiar la interfaz o publicar una versión con cambios visibles, actualiza el contenido en `scripts/manual/build_manual.js`, recaptura y regenera los PDF.**
+- `.gitignore` bloquea `*.pdf` (escritos), con excepción de `app/ayuda/*.pdf` y `docs/Manual_*.pdf`; `scripts/manual/capturas/` está ignorada.
+
 ## Copias de seguridad locales
 
 Sistema de respaldo local con rotación (carpeta `Backup/`, ignorada en git):

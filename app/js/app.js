@@ -4,16 +4,17 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS, resumenAnual,
-} from './calculo.js?v=1.5';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.5';
+} from './calculo.js?v=1.6';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.6';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.5';
+} from './github.js?v=1.6';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.5';
-import { crearPdf, crearPdfInforme } from './pdf.js?v=1.5';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.5';
+} from './escrito.js?v=1.6';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=1.6';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.6';
+import { htmlManual, pintarManual } from './ayuda.js?v=1.6';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -681,6 +682,11 @@ function vistaAjustes() {
         y, si hay cambios, sale un aviso con el botón «Actualizar».</p>
     </div></section>`}
 
+    <section class="tarjeta"><div class="cuerpo">
+      <h3>Manual de usuario</h3>
+      ${htmlManual('ajustes-manual', conToken)}
+    </div></section>
+
     <details class="tarjeta plegable"${conToken || estado.avisoCarga ? ' open' : ''}>
       <summary>🔒 Modo edición <small>Solo para Carlos</small></summary>
       <div class="cuerpo">
@@ -767,6 +773,9 @@ function vistaAyuda() {
   return `
     <h2>Ayuda</h2>
     <section class="tarjeta ayuda"><div class="cuerpo">
+      <h3>Manual de usuario</h3>
+      ${htmlManual('ayuda-manual', !!estado.token)}
+
       <h3>Para qué sirve</h3>
       <p>Sustituye al Excel de continuidades: guarda los días que hace cada uno, calcula lo que se debe
         (cupo de 5 para Rafa y 4 para Carlos) y prepara el escrito mensual para Gerencia.</p>
@@ -881,6 +890,8 @@ function pintar() {
   $contenido.dataset.vista = v;
   $contenido.innerHTML = VISTAS[v]();
   if (v === 'editar') refrescarEditor();
+  if (v === 'ayuda') pintarManual('ayuda-manual', !!estado.token);
+  if (v === 'ajustes') pintarManual('ajustes-manual', !!estado.token);
 }
 
 function actualizarModo() {
