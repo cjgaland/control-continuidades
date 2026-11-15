@@ -72,6 +72,22 @@
   "foto": "c09_ayuda"
  },
  {
+  "js": "const b=document.getElementById('btn-buscar-version'); const w=document.createElement('div'); w.id='cap-version'; w.style.cssText='padding:10px;background:#fff'; b.parentElement.before(w); w.append(b.parentElement, document.getElementById('ayuda-version-estado')); b.click(); await new Promise(r=>setTimeout(r,1500));",
+  "espera": 500
+ },
+ {
+  "foto": "c11_buscar_version",
+  "selector": "#cap-version",
+  "margen": 10
+ },
+ {
+  "js": "document.querySelector('#ayuda-manual button').click(); await new Promise(r=>setTimeout(r,3000));",
+  "espera": 500
+ },
+ {
+  "foto": "c12_visor_manual"
+ },
+ {
   "viewport": {
    "w": 390,
    "h": 844,

@@ -1,11 +1,16 @@
 // Versión de la app e historial de cambios (se muestra en la portada y en Ayuda).
 // Para publicar una versión nueva: node scripts/nueva-version.mjs 1.2 "Qué cambia"
 
-export const VERSION = '1.8';
+export const VERSION = '1.9';
 export const ANIO = 2026;
 export const AUTOR = 'Carlos J. Galán Doval';
 
 export const HISTORIAL = [
+  {
+    version: '1.9',
+    fecha: '15-11-2026',
+    cambios: 'En el iPad, «Ver PDF» del informe se abre dentro de la app y «Descargar PDF» abre la hoja de Compartir. Manuales 1.2.',
+  },
   {
     version: '1.8',
     fecha: '15-11-2026',

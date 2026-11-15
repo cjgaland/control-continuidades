@@ -4,17 +4,18 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS, resumenAnual,
-} from './calculo.js?v=1.8';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.8';
+} from './calculo.js?v=1.9';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.9';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.8';
+} from './github.js?v=1.9';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.8';
-import { crearPdf, crearPdfInforme } from './pdf.js?v=1.8';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.8';
-import { htmlManual, pintarManual } from './ayuda.js?v=1.8';
+} from './escrito.js?v=1.9';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=1.9';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.9';
+import { esIOS, verEnVentana, guardarArchivo } from './visor.js?v=1.9';
+import { htmlManual, pintarManual } from './ayuda.js?v=1.9';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -323,7 +324,19 @@ async function pdfInforme() {
 }
 
 async function verPdfInforme() {
-  // La ventana se abre antes de generar el PDF para que el navegador no la bloquee.
+  // En iPad/iPhone, dentro de la app: con la app en la pantalla de inicio, otra pestaña (o abrir el PDF en su lugar) la dejaba sin vuelta atrás.
+  if (esIOS()) {
+    avisoInforme('Preparando el PDF…');
+    try {
+      const { blob, nombre } = await pdfInforme();
+      const url = URL.createObjectURL(blob);
+      avisoInforme('');
+      await verEnVentana(nombre, url, nombre);
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
+    } catch (err) { avisoInforme(err.message, true); }
+    return;
+  }
+  // En el ordenador, otra pestaña (desde ahí se imprime). Se abre antes de generar el PDF para que el navegador no la bloquee.
   const ventana = window.open('', '_blank');
   avisoInforme('Preparando el PDF…');
   try {
@@ -342,12 +355,7 @@ async function descargarPdfInforme() {
   avisoInforme('Preparando el PDF…');
   try {
     const { blob, nombre } = await pdfInforme();
-    const url = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement('a'), { href: url, download: nombre });
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    await guardarArchivo(blob, nombre); // en iPad/iPhone, hoja de Compartir; en el ordenador, descarga
     avisoInforme(`Descargado: ${nombre}`);
   } catch (err) {
     avisoInforme(err.message, true);
