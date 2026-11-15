@@ -1,11 +1,16 @@
 // Versión de la app e historial de cambios (se muestra en la portada y en Ayuda).
 // Para publicar una versión nueva: node scripts/nueva-version.mjs 1.2 "Qué cambia"
 
-export const VERSION = '1.7';
+export const VERSION = '1.8';
 export const ANIO = 2026;
 export const AUTOR = 'Carlos J. Galán Doval';
 
 export const HISTORIAL = [
+  {
+    version: '1.8',
+    fecha: '15-11-2026',
+    cambios: 'Ayuda: botón «Buscar actualizaciones» para comprobar en el momento si hay versión nueva. El manual se ve dentro de la app (en el iPad ya no se cierra al volver).',
+  },
   {
     version: '1.7',
     fecha: '14-11-2026',

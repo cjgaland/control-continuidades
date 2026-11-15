@@ -434,3 +434,10 @@ details.guia > summary { cursor: pointer; color: var(--marino); font-weight: 600
 .portal-enlace { display: inline-flex; align-items: center; gap: 5px; height: 32px; padding: 0 11px; border-radius: 99px;
   border: 1px solid rgba(255,255,255,.5); color: #fff; text-decoration: none; font-size: .8rem; font-weight: 600; white-space: nowrap; }
 .portal-enlace:hover { background: rgba(255,255,255,.15); }
+
+/* Ayuda: versión instalada y «Buscar actualizaciones» */
+.buscar-version { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.buscar-version .boton { min-height: 36px; padding: 6px 14px; }
+
+/* Visor del manual y aviso de versión: color de la app */
+:root { --color-version: var(--marino); }

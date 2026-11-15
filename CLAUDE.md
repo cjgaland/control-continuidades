@@ -105,6 +105,10 @@ El token de edición **nunca** va al código ni a un commit. Si se pierde un dis
   archivos antiguos de la caché de Pages). **Todos los `import` entre módulos deben llevar el mismo `?v=`.**
 - La app comprueba cada minuto (y al volver a la pestaña) si hay versión nueva o datos nuevos, y muestra un aviso
   con el botón «Actualizar». No hay service worker, a propósito (dio problemas en otras apps).
+- En Ayuda, «Buscar actualizaciones» comprueba en el momento (desde la 1.8).
+- El manual se abre DENTRO de la app (`app/js/visor.js` con pdf.js en `app/vendor/pdfjs/`, el mismo visor que Permisos, Dietas y
+  Actividad): en el iPad, con la app en la pantalla de inicio, abrir el PDF «fuera» la dejaba sin vuelta atrás. No usar
+  `target="_blank"` para archivos de la propia app.
 
 ## Manual de usuario
 - Dos manuales, en Word y PDF: **consulta** (`Manual_Control_Continuidades`) y **Modo edición** (`..._Edicion`, superconjunto con lo exclusivo marcado en morado).

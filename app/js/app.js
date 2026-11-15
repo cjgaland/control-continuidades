@@ -4,17 +4,17 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS, resumenAnual,
-} from './calculo.js?v=1.7';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.7';
+} from './calculo.js?v=1.8';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.8';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.7';
+} from './github.js?v=1.8';
 import {
   CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.7';
-import { crearPdf, crearPdfInforme } from './pdf.js?v=1.7';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.7';
-import { htmlManual, pintarManual } from './ayuda.js?v=1.7';
+} from './escrito.js?v=1.8';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=1.8';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.8';
+import { htmlManual, pintarManual } from './ayuda.js?v=1.8';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -800,6 +800,9 @@ function vistaAyuda() {
       <h3>Avisos de cambios</h3>
       <p>Si mientras tienes la app abierta se guardan datos nuevos (por ejemplo, desde otro dispositivo) o se publica
         una versión nueva, aparece arriba un aviso con el botón <b>Actualizar</b>. Al pulsarlo se recarga con lo último.</p>
+      <p class="buscar-version">Versión instalada: <b>v${VERSION}</b>
+        <button type="button" id="btn-buscar-version" class="boton secundario">Buscar actualizaciones</button></p>
+      <p id="ayuda-version-estado" class="aviso" role="status"></p>
 
       <h3>Instalarla en el móvil</h3>
       <ul>
@@ -852,6 +855,31 @@ async function comprobarCambios() {
     if (await hayDatosNuevos()) mostrarAvisoCambios('🔄 Se han guardado datos nuevos.');
   } catch { /* sin conexión: se vuelve a intentar más tarde */ }
 }
+
+/** Botón «Buscar actualizaciones» de Ayuda: comprueba ahora si hay versión nueva. */
+async function buscarActualizaciones(boton) {
+  const estadoVersion = document.getElementById('ayuda-version-estado');
+  boton.disabled = true; boton.textContent = 'Buscando…';
+  try {
+    const v = await hayVersionNueva();
+    if (v) {
+      mostrarAvisoCambios(`🔄 Hay una versión nueva de la app (v${v}).`);
+      estadoVersion.textContent = `Hay una versión nueva (v${v}): pulsa «Actualizar» en el aviso de arriba.`;
+    } else {
+      estadoVersion.textContent = `Tienes la última versión (v${VERSION}).`;
+    }
+    estadoVersion.classList.remove('error');
+  } catch {
+    estadoVersion.textContent = 'No se ha podido comprobar (¿sin conexión?). Inténtalo más tarde.';
+    estadoVersion.classList.add('error');
+  } finally {
+    boton.disabled = false; boton.textContent = 'Buscar actualizaciones';
+  }
+}
+
+$contenido.addEventListener('click', (e) => {
+  if (e.target.id === 'btn-buscar-version') buscarActualizaciones(e.target);
+});
 
 function actualizarApp() {
   if (estado.edicion?.sucio && !confirm('Hay cambios sin guardar en Editar. ¿Actualizar y perderlos?')) return;

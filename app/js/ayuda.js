@@ -1,6 +1,8 @@
 // Manual de usuario descargable: los PDF viven en app/ayuda/ (se generan con scripts/manual/generar.sh).
 // Las rutas son relativas a app/index.html, así funcionan en GitHub Pages (…/control-continuidades/app/).
 
+import { verEnVentana } from './visor.js?v=1.8';
+
 export const RUTA_MANUAL_CONSULTA = 'ayuda/Manual_Control_Continuidades.pdf';
 export const RUTA_MANUAL_EDICION = 'ayuda/Manual_Control_Continuidades_Edicion.pdf';
 
@@ -37,8 +39,11 @@ export function pintarManual(idCaja, conEdicion) {
   manualDisponible(ruta).then((hay) => {
     const caja = document.getElementById(idCaja);
     if (!caja) return; // se ha cambiado de pantalla mientras se comprobaba
+    // Se abre DENTRO de la app (en el iPad, abrir el PDF «fuera» dejaba la app de pantalla de inicio sin vuelta atrás).
     caja.innerHTML = hay
-      ? `<a class="boton" href="${ruta}" target="_blank" rel="noopener">Descargar manual (PDF)</a>`
+      ? '<button type="button" class="boton">Ver manual (PDF)</button>'
       : '<p class="nota">El manual estará disponible en breve.</p>';
+    caja.querySelector('button')?.addEventListener('click', () => verEnVentana(
+      conEdicion ? 'Manual (Modo edición)' : 'Manual de uso', ruta, ruta.split('/').pop()));
   });
 }
