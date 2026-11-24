@@ -127,3 +127,11 @@ Sistema de respaldo local con rotación (carpeta `Backup/`, ignorada en git):
 - Disparadores: "Haz una copia" / "Copia de seguridad", o antes de publicar una versión nueva.
 - Script: skill personal `app-copia_seguridad`
   (`bash /Users/Trabajo/.claude/skills/app-copia_seguridad/scripts/copia_seguridad.sh --root "/Users/Trabajo/Desktop/Gestión/ServicioCalidad/Control Continuidades" --name "ControlContinuidades"`).
+
+
+## Recursos comunes de la Unidad (anotado el 15/11/2026)
+En `/Users/Trabajo/Desktop/Gestión/ServicioCalidad/` hay tres carpetas compartidas por todas las apps de la Unidad. Usarlas siempre que una app necesite logotipos, fotos o firmas, en vez de pedirlas o inventarlas:
+- `00 Logos/` — Junta de Andalucía y SAS, AGS Sur de Córdoba y Unidad de Calidad y Seguridad del Paciente (color, monocromo e invertido; con y sin texto; PNG y SVG; con su LEEME).
+- `01 Fotos/` — retratos de Carlos, Rafa y Mariola (`*_blanco.png` con fondo blanco y `*_transparente.png` sin fondo, 1122×1402; originales en `Originales/`).
+- `02 Firmas/` — firmas de Carlos, Rafa y María Luisa (PNG, JPEG y HEIC).
+Fotos y firmas son datos personales: no subirlas a repositorios ni a webs públicas; en apps privadas, guardarlas en la base de datos o en carpetas ignoradas por git.
