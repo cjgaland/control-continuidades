@@ -64,12 +64,41 @@ export async function crearPdf(texto, cabecera) {
     const negrita = cabecerasMes.test(linea);
     doc.setFont('helvetica', negrita ? 'bold' : 'normal');
     const x = vineta ? margen + 8 : margen;
-    const partes = doc.splitTextToSize(vineta ? linea.trimStart() : linea, ancho - (x - margen));
+    const contenido = vineta ? linea.trimStart() : linea;
+    // Línea con débitos que cabe en una sola línea: se escribe por trozos para poner las cifras en color.
+    if (/(Débito mensual |Acumulados \d{4}\/\d{2} )[-+]\d+/.test(contenido) && doc.getTextWidth(contenido) <= ancho - (x - margen)) {
+      salto(alto);
+      escribirConColor(doc, contenido, x, y);
+      y += alto;
+      continue;
+    }
+    if (negrita) doc.setTextColor(31, 56, 100);
+    const partes = doc.splitTextToSize(contenido, ancho - (x - margen));
     salto(alto * partes.length);
     doc.text(partes, x, y);
+    doc.setTextColor(0, 0, 0);
     y += alto * partes.length;
   }
   return doc.output('blob');
+}
+
+// Escribe una línea poniendo en rojo los débitos («-3») y en verde las cifras a favor («+1»).
+function escribirConColor(doc, texto, x, y) {
+  const trozos = texto.split(/((?:Débito mensual |Acumulados \d{4}\/\d{2} )[-+]\d+)/);
+  let cx = x;
+  for (const trozo of trozos) {
+    if (!trozo) continue;
+    const m = trozo.match(/^(Débito mensual |Acumulados \d{4}\/\d{2} )([-+]\d+)$/);
+    const partes = m ? [[m[1], null], [m[2], m[2].startsWith('-') ? [179, 38, 30] : [46, 125, 50]]] : [[trozo, null]];
+    for (const [t, color] of partes) {
+      doc.setFont('helvetica', color ? 'bold' : 'normal');
+      doc.setTextColor(...(color ?? [0, 0, 0]));
+      doc.text(t, cx, y);
+      cx += doc.getTextWidth(t);
+    }
+  }
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0, 0, 0);
 }
 
 // ---------- Informe anual ----------

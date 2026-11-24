@@ -1,7 +1,7 @@
 // Manual de usuario descargable: los PDF viven en app/ayuda/ (se generan con scripts/manual/generar.sh).
 // Las rutas son relativas a app/index.html, así funcionan en GitHub Pages (…/control-continuidades/app/).
 
-import { verEnVentana } from './visor.js?v=1.9';
+import { verEnVentana } from './visor.js?v=2.0';
 
 export const RUTA_MANUAL_CONSULTA = 'ayuda/Manual_Control_Continuidades.pdf';
 export const RUTA_MANUAL_EDICION = 'ayuda/Manual_Control_Continuidades_Edicion.pdf';

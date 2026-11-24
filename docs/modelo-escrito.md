@@ -14,6 +14,7 @@ si los aprueban, los pasen a Nóminas.
 | De | Carlos J. Galán Doval — carlosjavier.galan.sspa@juntadeandalucia.es (cuenta corporativa) |
 | Para | Pedro M. Castro Cobos (Gerente del Área de Gestión Sanitaria Sur de Córdoba) — pedromanuel.castro.sspa@juntadeandalucia.es |
 | Para | Soledad Delgado Zafra (Directora Médica del Área) — soledad.delgado.sspa@juntadeandalucia.es |
+| Para | Rafa Benítez — rafaelj.bautista.sspa@juntadeandalucia.es (desde el 24-11-2026) |
 | CCO | Rafa — rjavier.romero.sspa@juntadeandalucia.es |
 | Asunto (propuesta) | `Continuidades Área de Calidad: Septiembre 2026, Octubre 2026 y previsión de Noviembre 2026` |
 

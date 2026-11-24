@@ -63,7 +63,7 @@ test('Nombre del PDF', () => {
 
 test('Enlace de correo con destinatarios, CCO y asunto', () => {
   const url = enlaceCorreo('Asunto á', 'Línea 1\nLínea 2');
-  assert.ok(url.startsWith('mailto:pedromanuel.castro.sspa@juntadeandalucia.es,soledad.delgado.sspa@juntadeandalucia.es?bcc=rjavier.romero.sspa@juntadeandalucia.es&subject='));
+  assert.ok(url.startsWith('mailto:pedromanuel.castro.sspa@juntadeandalucia.es,soledad.delgado.sspa@juntadeandalucia.es,rafaelj.bautista.sspa@juntadeandalucia.es?bcc=rjavier.romero.sspa@juntadeandalucia.es&subject='));
   assert.ok(url.includes('%0D%0A'));
 });
 
@@ -71,4 +71,16 @@ test('Propuesta por defecto: septiembre, octubre y previsión de noviembre', () 
   const p = propuestaEscrito(datos, new Date(2026, 9, 16, 10, 0));
   assert.deepEqual(p, { primerMes: '2026-09', numMeses: 3, prevision: true, saludo: 'Buenos días' });
   assert.equal(propuestaEscrito(datos, new Date(2026, 9, 16, 17, 0)).saludo, 'Buenas tardes');
+});
+
+test('Escrito con color: meses en negrita y débitos en rojo', async () => {
+  const { escritoHtml } = await import('../app/js/escrito.js');
+  const html = escritoHtml(generarEscrito(datos, OPC, HOY));
+  assert.match(html, /<b class="esc-mes">Septiembre 2026<\/b>/);
+  assert.match(html, /Débito mensual <span class="esc-debe">-3<\/span>; Acumulados 2024\/26 <span class="esc-debe">-56<\/span>/);
+  assert.match(html, /<br>&nbsp;&nbsp;&nbsp;&nbsp;• Día 2, miércoles\./);
+  assert.ok(!/esc-debe">0</.test(html), 'el 0 no va en rojo');
+  const correo = escritoHtml('Rafa: Solicitados 6 (Débito mensual +1; Acumulados 2024/26 -55)', true);
+  assert.match(correo, /<span style="color:#2E7D32;font-weight:bold">\+1<\/span>/);
+  assert.match(correo, /<span style="color:#B3261E;font-weight:bold">-55<\/span>/);
 });

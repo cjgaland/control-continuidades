@@ -1,11 +1,16 @@
 // Versión de la app e historial de cambios (se muestra en la portada y en Ayuda).
 // Para publicar una versión nueva: node scripts/nueva-version.mjs 1.2 "Qué cambia"
 
-export const VERSION = '1.9';
+export const VERSION = '2.0';
 export const ANIO = 2026;
 export const AUTOR = 'Carlos J. Galán Doval';
 
 export const HISTORIAL = [
+  {
+    version: '2.0',
+    fecha: '24-11-2026',
+    cambios: 'Más color: en el Histórico, Rafa con fondo azul claro y Carlos con fondo crema, los días en cursiva, los débitos en rojo y la marca de abonado en verde. En el Escrito, los meses en negrita y los débitos en rojo (también al copiar el texto y en el PDF). Rafa Benítez se añade a los destinatarios del correo.',
+  },
   {
     version: '1.9',
     fecha: '15-11-2026',

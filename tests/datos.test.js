@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { aplicarMes, mensajeCommit, validarMes, aJson, aBase64, deBase64 } from '../app/js/datos.js';
 import { acumuladoTotal } from '../app/js/calculo.js';
 
-const datos = JSON.parse(readFileSync(new URL('../datos/continuidades.json', import.meta.url)));
+// Foto fija de los datos: los reales cambian desde la app.
+const datos = JSON.parse(readFileSync(new URL('./datos/continuidades_16-10-2026.json', import.meta.url)));
 const HOY = new Date(2026, 9, 16);
 
 test('Alta de un mes nuevo: queda en orden y no toca el original', () => {

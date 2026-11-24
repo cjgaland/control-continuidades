@@ -4,11 +4,15 @@
 import {
   PERSONAS, NOMBRES_MES, ABREV_MES, partirClave, nombreMes, mesSiguiente, diaSemana,
   registro, debitoMensual, acumuladoTotal, abonadoHasta, claveDeHoy, INICIO,
-} from './calculo.js?v=1.9';
+} from './calculo.js?v=2.0';
 
 export const CORREO = {
   de: 'carlosjavier.galan.sspa@juntadeandalucia.es',
-  para: ['pedromanuel.castro.sspa@juntadeandalucia.es', 'soledad.delgado.sspa@juntadeandalucia.es'],
+  para: [
+    'pedromanuel.castro.sspa@juntadeandalucia.es',
+    'soledad.delgado.sspa@juntadeandalucia.es',
+    'rafaelj.bautista.sspa@juntadeandalucia.es', // Rafa Benítez (añadido el 24-11-2026)
+  ],
   cco: ['rjavier.romero.sspa@juntadeandalucia.es'],
 };
 
@@ -136,4 +140,32 @@ export function propuestaEscrito(datos, hoy) {
     prevision: mesSiguiente(primerMes, numMeses - 1) > actual,
     saludo: f.getHours() < 14 ? 'Buenos días' : 'Buenas tardes',
   };
+}
+
+// ---------- Escrito con color (pantalla y «Copiar texto») ----------
+
+const ROJO_ESCRITO = '#B3261E';
+const VERDE_ESCRITO = '#2E7D32';
+const MES_ANIO = new RegExp(`^(${NOMBRES_MES.join('|')}) \\d{4}$`);
+const CIFRA_DEBITO = /(Débito mensual |Acumulados \d{4}\/\d{2} )([-+]\d+)/g;
+
+const escHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// Convierte el texto del escrito en HTML: los meses en negrita y los débitos en rojo
+// (las cifras a favor, «+1», en verde). Con enLinea = true usa estilos en línea, para
+// que el color se conserve al pegarlo en un correo; si no, usa clases CSS.
+export function escritoHtml(texto, enLinea = false) {
+  const negrita = (t) => (enLinea ? `<b>${t}</b>` : `<b class="esc-mes">${t}</b>`);
+  const cifra = (n) => {
+    const rojo = n.startsWith('-');
+    if (enLinea) return `<span style="color:${rojo ? ROJO_ESCRITO : VERDE_ESCRITO};font-weight:bold">${n}</span>`;
+    return `<span class="${rojo ? 'esc-debe' : 'esc-favor'}">${n}</span>`;
+  };
+  return texto.split('\n').map((linea) => {
+    const sangria = linea.match(/^ */)[0].length;
+    let h = escHtml(linea.slice(sangria));
+    if (MES_ANIO.test(linea)) h = negrita(h);
+    else h = h.replace(CIFRA_DEBITO, (_, etiqueta, n) => `${etiqueta}${cifra(n)}`);
+    return '&nbsp;'.repeat(sangria) + h;
+  }).join('<br>');
 }

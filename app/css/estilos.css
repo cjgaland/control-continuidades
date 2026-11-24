@@ -4,8 +4,14 @@
   --marino-2: #2F5597;
   --claro: #D9E2F3;
   --claro-2: #EEF3FA;
-  --rojo: #C00000;
+  --rojo: #B3261E; /* rojo elegante, contrasta con el azul marino */
   --verde: #2E7D32;
+  --verde-check: #1E9E4A;
+  /* Color de fondo de cada persona (Histórico) */
+  --fondo-rafa: #EDF3FC;
+  --acento-rafa: #2F5597;
+  --fondo-carlos: #FBF3E6;
+  --acento-carlos: #B7791F;
   --texto: #1d2433;
   --gris: #6b7280;
   --borde: #c9d3e6;
@@ -124,8 +130,19 @@ select, input[type=number], input[type=text], input[type=password], textarea {
 .mes .persona + .persona { border-left: 1px solid var(--borde); }
 .mes .persona b { display: block; color: var(--marino); }
 .mes .persona .linea { display: flex; justify-content: space-between; gap: 6px; }
-.mes .persona .linea span:first-child { color: var(--gris); }
-.check { color: var(--verde); font-weight: 700; }
+.mes .persona .linea > span:first-child { color: var(--gris); }
+.mes .persona .linea .debe { font-weight: 600; }
+.mes .persona-rafa { background: var(--fondo-rafa); box-shadow: inset 3px 0 0 var(--acento-rafa); }
+.mes .persona-carlos { background: var(--fondo-carlos); box-shadow: inset 3px 0 0 var(--acento-carlos); }
+.mes .persona-carlos b { color: #7a4f12; }
+.mes .persona:last-child { border-radius: 0 0 var(--radio) 0; }
+.mes .persona:first-child { border-radius: 0 0 0 var(--radio); }
+.mes .dias-mes { font-style: italic; color: #3a4252; }
+.check {
+  display: inline-flex; align-items: center; justify-content: center; width: 1.15em; height: 1.15em;
+  border-radius: 50%; background: var(--verde-check); color: #fff; font-size: .78em; font-weight: 800; font-style: normal;
+  vertical-align: .05em;
+}
 
 /* ---------- Informe anual ---------- */
 .informe { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 14px; }
@@ -184,9 +201,13 @@ table.excel.totales td.mes-nombre { white-space: normal; }
 .correo dd { margin: 0; word-break: break-word; }
 
 .texto-escrito {
-  width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; line-height: 1.45;
-  white-space: pre-wrap; resize: vertical;
+  width: 100%; font-size: .92rem; line-height: 1.5; color: var(--texto);
+  background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio);
+  padding: 12px 14px; overflow: auto; overflow-wrap: anywhere;
 }
+.texto-escrito .esc-mes { color: var(--marino); font-size: 1.02em; }
+.texto-escrito .esc-debe { color: var(--rojo); font-weight: 700; }
+.texto-escrito .esc-favor { color: var(--verde); font-weight: 700; }
 .botones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 @media (min-width: 760px) { .botones { display: flex; flex-wrap: wrap; } }
 .aviso { min-height: 1.4em; font-size: .9rem; color: var(--verde); }
@@ -441,3 +462,9 @@ details.guia > summary { cursor: pointer; color: var(--marino); font-weight: 600
 
 /* Visor del manual y aviso de versión: color de la app */
 :root { --color-version: var(--marino); }
+
+/* Leyenda del Histórico */
+.leyenda-historico { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.muestra { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
+.muestra-rafa { background: var(--fondo-rafa); box-shadow: inset 3px 0 0 var(--acento-rafa); border: 1px solid var(--borde); }
+.muestra-carlos { background: var(--fondo-carlos); box-shadow: inset 3px 0 0 var(--acento-carlos); border: 1px solid var(--borde); }

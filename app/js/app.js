@@ -4,18 +4,18 @@ import {
   INICIO, PERSONAS, NOMBRES_MES, ABREV_MES, claveMes, partirClave, nombreMes, rangoMeses,
   diaSemana, registro, debitoMensual, acumuladoAnio, debitoAnual, acumuladoTotal, abonadoHasta,
   resumen, aniosDisponibles, claveDeHoy, mesTerminado, mesSiguiente, MAX_DIAS, resumenAnual,
-} from './calculo.js?v=1.9';
-import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=1.9';
+} from './calculo.js?v=2.0';
+import { aplicarMes, mensajeCommit, validarMes } from './datos.js?v=2.0';
 import {
   repositorio, leerToken, guardarToken, olvidarToken, leerDatos, guardarDatos, comprobarToken, ErrorConflicto,
-} from './github.js?v=1.9';
+} from './github.js?v=2.0';
 import {
-  CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito,
-} from './escrito.js?v=1.9';
-import { crearPdf, crearPdfInforme } from './pdf.js?v=1.9';
-import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=1.9';
-import { esIOS, verEnVentana, guardarArchivo } from './visor.js?v=1.9';
-import { htmlManual, pintarManual } from './ayuda.js?v=1.9';
+  CORREO, SALUDOS, generarEscrito, asuntoEscrito, enlaceCorreo, nombrePdf, propuestaEscrito, escritoHtml,
+} from './escrito.js?v=2.0';
+import { crearPdf, crearPdfInforme } from './pdf.js?v=2.0';
+import { VERSION, ANIO, AUTOR, HISTORIAL } from './version.js?v=2.0';
+import { esIOS, verEnVentana, guardarArchivo } from './visor.js?v=2.0';
+import { htmlManual, pintarManual } from './ayuda.js?v=2.0';
 
 const URL_DATOS = '../datos/continuidades.json';
 
@@ -130,9 +130,9 @@ function vistaHistorico() {
         ? textoAusencia(reg.ausencia)
         : reg.dias.map((d) => `${d} ${abrevSemana(anio, mes, d)}`).join(', ') || '—';
       return `
-        <div class="persona">
+        <div class="persona persona-${p}">
           <b>${PERSONAS[p].nombre}${reg.abonado ? ' <span class="check" title="Abonado">✓</span>' : ''}</b>
-          <div>${dias}</div>
+          <div class="dias-mes">${dias}</div>
           <div class="linea"><span>Débito mes</span><span>${deb(debitoMensual(estado.datos, clave, p, estado.hoy))}</span></div>
           <div class="linea"><span>Acum. ${anio}</span><span>${deb(acumuladoAnio(estado.datos, clave, p, estado.hoy))}</span></div>
           <div class="linea"><span>Acum. total</span><span>${deb(acumuladoTotal(estado.datos, clave, p, estado.hoy))}</span></div>
@@ -150,7 +150,7 @@ function vistaHistorico() {
     <div class="barra">
       <label for="sel-anio-h">Año</label>
       <select id="sel-anio-h">${opcionesAnio(filtro, true)}</select>
-      <span class="nota">✓ = abonado</span>
+      <span class="nota leyenda-historico"><span class="check">✓</span> abonado · <i class="muestra muestra-rafa"></i> Rafa · <i class="muestra muestra-carlos"></i> Carlos</span>
     </div>
     <div class="lista-meses">${tarjetas || '<p class="vacio">No hay meses.</p>'}</div>`;
 }
@@ -398,7 +398,7 @@ function vistaEscrito() {
       <div><dt>CCO</dt><dd>${CORREO.cco.join(', ')}</dd></div>
       <div><dt>Asunto</dt><dd id="esc-asunto">${esc(asuntoEscrito(o))}</dd></div>
     </dl>
-    <textarea id="esc-texto" class="texto-escrito" readonly rows="18">${esc(texto)}</textarea>
+    <div id="esc-texto" class="texto-escrito" tabindex="0" aria-label="Texto del escrito">${escritoHtml(texto)}</div>
     <div class="botones">
       <button class="boton" id="btn-copiar" type="button">Copiar texto</button>
       <button class="boton" id="btn-correo" type="button">Abrir correo</button>
@@ -425,16 +425,30 @@ function aviso(texto, error = false) {
   el.classList.toggle('error', error);
 }
 
+// Copia el escrito con formato (meses en negrita y débitos en rojo) y, a la vez, como
+// texto normal: el programa de correo elige el que sepa pegar.
 async function copiarTexto() {
   const texto = generarEscrito(estado.datos, estado.escrito, estado.hoy);
+  const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt">${escritoHtml(texto, true)}</div>`;
   try {
-    await navigator.clipboard.writeText(texto);
+    if (window.ClipboardItem && navigator.clipboard?.write) {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([texto], { type: 'text/plain' }),
+      })]);
+    } else {
+      await navigator.clipboard.writeText(texto);
+    }
   } catch {
-    const ta = document.getElementById('esc-texto');
-    ta.select();
+    const sel = window.getSelection();
+    const rango = document.createRange();
+    rango.selectNodeContents(document.getElementById('esc-texto'));
+    sel.removeAllRanges();
+    sel.addRange(rango);
     document.execCommand('copy');
+    sel.removeAllRanges();
   }
-  aviso('Texto copiado. Ya puedes pegarlo en el correo.');
+  aviso('Texto copiado con formato. Ya puedes pegarlo en el correo.');
 }
 
 function abrirCorreo() {
@@ -791,9 +805,9 @@ function vistaAyuda() {
       <h3>Pantallas</h3>
       <ul>
         <li><b>Resumen</b>: débito del mes, acumulado del año, débito anual, acumulado total y hasta qué mes se ha abonado.</li>
-        <li><b>Histórico</b>: todos los meses desde agosto de 2024, con filtro por año. ✓ = abonado.</li>
+        <li><b>Histórico</b>: todos los meses desde agosto de 2024, con filtro por año. Rafa en azul claro y Carlos en crema; los débitos en rojo y ✓ verde = abonado.</li>
         <li><b>Informe</b>: el año en formato parecido a la hoja del Excel. «Ver PDF» lo abre para verlo o imprimirlo; «Descargar PDF» lo guarda (en el móvil, «Ver / compartir PDF» abre el menú Compartir, con Imprimir y Guardar en Drive). Debajo, el resumen del año: días solicitados frente al cupo, meses abonados y pendientes, y una tira de colores con el estado de cada mes.</li>
-        <li><b>Escrito</b>: el texto para Gerencia, con «Copiar texto», «Abrir correo» y «Guardar PDF» (en el móvil, «Compartir PDF» para mandarlo a Drive).</li>
+        <li><b>Escrito</b>: el texto para Gerencia, con los meses en negrita y los débitos en rojo, y los botones «Copiar texto» (copia con ese formato), «Abrir correo» y «Guardar PDF» (en el móvil, «Compartir PDF» para mandarlo a Drive).</li>
         <li><b>Editar</b> (solo Carlos, con su token): anotar los días del mes, vacaciones o baja del mes completo y «abonado».</li>
       </ul>
 

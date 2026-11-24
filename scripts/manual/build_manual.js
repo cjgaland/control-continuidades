@@ -17,7 +17,7 @@ const APP = {
   nombreCorto: 'Control de Continuidades',
   organizacion: ['Unidad de Calidad y Seguridad del Paciente', 'Hospital Comarcal de Montilla', 'Área de Gestión Sanitaria Sur de Córdoba'],
   autor: 'Carlos J. Galán Doval',
-  version: '1.2',
+  version: '1.3',
   fecha: 'noviembre 2026',
 };
 const PALETA = {
@@ -130,7 +130,8 @@ const CAPITULOS = [
     titulo: '6. Histórico',
     intro: 'Todos los meses, uno debajo de otro, con los días de cada persona y sus débitos.',
     bloques: [
-      { h: 'Cómo está organizado', parrafos: ['Cada mes es una tarjeta con Rafa y Carlos. Por persona verás los días (con la abreviatura del día de la semana), el **Débito mes**, el **Acum. del año** y el **Acum. total**. Los meses completos de vacaciones o baja lo dicen con esas palabras. Una marca **✓** junto al nombre indica que ese mes está **abonado**. Los meses por llegar llevan la etiqueta **previsión**.'] },
+      { h: 'Cómo está organizado', parrafos: ['Cada mes es una tarjeta con Rafa y Carlos. Por persona verás los días (con la abreviatura del día de la semana), el **Débito mes**, el **Acum. del año** y el **Acum. total**. Los meses completos de vacaciones o baja lo dicen con esas palabras. Una marca **✓** verde junto al nombre indica que ese mes está **abonado**. Los meses por llegar llevan la etiqueta **previsión**.',
+        'Para distinguir a cada uno de un vistazo, la parte de **Rafa** tiene el fondo **azul claro** y la de **Carlos**, **crema**. Los días van en *cursiva* y los débitos, en **rojo**. La leyenda está arriba, junto al selector de año.'] },
       { h: 'Filtrar por año', parrafos: ['El selector **Año** reduce la lista a un año. Con «Todos» salen los meses desde agosto de 2024, empezando por el más reciente.'],
         imagen: fig('c04_historico.png', 'Histórico del año 2025: en agosto, Rafa estuvo de vacaciones.'),
         tip: { titulo: 'Buscar cuándo se abonó algo', lineas: ['Recorre el Histórico buscando las marcas ✓: la última de cada persona es su «Abonado hasta».'] } },
@@ -160,21 +161,22 @@ const CAPITULOS = [
   },
   {
     titulo: '8. El escrito mensual a Gerencia',
-    intro: 'Cada mes se manda a Sole (Dirección Médica) y a Pedro (Gerencia) un correo con los días de continuidades, para que los valoren y los pasen a Nóminas. Esta pantalla lo escribe sola con los datos guardados.',
+    intro: 'Cada mes se manda a Sole (Dirección Médica), a Pedro (Gerencia) y a Rafa Benítez un correo con los días de continuidades, para que los valoren y los pasen a Nóminas. Esta pantalla lo escribe sola con los datos guardados.',
     bloques: [
       { h: 'Qué ves', parrafos: ['A la izquierda están las opciones y los datos del correo; a la derecha, el texto completo. En el móvil, todo seguido.'], lista: [
         '**Primer mes** y **Número de meses** (de 1 a 4): qué meses se incluyen. Al abrir, la aplicación propone sola desde el primer mes sin abonar hasta el mes siguiente.',
         '**Saludo**: «Buenos días» por la mañana y «Buenas tardes» por la tarde (se puede cambiar).',
         '**El último mes es previsión**: marcada, el texto dice «y la previsión de…».',
-        '**Para**, **CCO** y **Asunto**: los destinatarios y el título del correo. Rafa va en copia oculta (CCO).'],
+        '**Para**, **CCO** y **Asunto**: los destinatarios y el título del correo. En «Para» van Pedro, Sole y Rafa Benítez; Rafa Romero va en copia oculta (CCO).'],
         imagen: fig('c07_escrito.png', 'El escrito de octubre a diciembre de 2026, con diciembre como previsión.') },
       { h: 'Cómo se lee el texto', parrafos: [
         'Empieza con el saludo y una frase que dice qué meses se informan y **hasta qué mes se ha abonado**. Si a los dos se les abonó hasta el mismo mes, lo dice una vez; si no, lo dice por separado para cada uno.',
         'Después, un bloque por mes. En la línea de **Rafa** pone los días **solicitados**, el **débito mensual** y los **acumulados** (por ejemplo, «Solicitados 4 (Débito mensual -1; Acumulados 2024/26 -61)»), y debajo los días con su día de la semana. Carlos lleva el mismo formato; solo escribe «Carlos:» a secas cuando su débito del mes y su acumulado son 0.',
-        'Un mes de vacaciones o baja sale como «vacaciones el mes completo (sin débito)».'],
+        'Un mes de vacaciones o baja sale como «vacaciones el mes completo (sin débito)».',
+        'Para que se lea mejor, los **meses** van en **negrita** y las cifras de **débito**, en **rojo** (las hechas de más, en verde). Ese formato se conserva al copiar el texto y en el PDF.'],
         tip: { titulo: 'Los signos', lineas: ['En el escrito el débito se escribe en **negativo** (-1 es «se debe 1») y las horas hechas de más con **+**. Es el formato que usaba el Excel.'] } },
       { h: 'Los botones', lista: [
-        '**Copiar texto**: copia el texto al portapapeles para pegarlo donde quieras.',
+        '**Copiar texto**: copia el texto **con su formato** (meses en negrita y débitos en rojo) para pegarlo en el correo. Si el programa donde pegas no admite formato, se pega como texto normal.',
         '**Abrir correo**: abre tu programa de correo con el mensaje ya rellenado (Para, CCO, Asunto y texto).',
         '**Guardar PDF**: descarga el escrito en PDF con el nombre «AAAA-MM-DD_Escrito_meses.pdf».',
         '**Compartir PDF (Drive)**: solo aparece en dispositivos que lo permiten (sobre todo el móvil); abre el menú de compartir para enviar el PDF a Google Drive.'],
@@ -197,7 +199,7 @@ const CAPITULOS = [
       { h: 'Ver y guardar el manual', pasos: ['Abre **Ajustes** (o la **Ayuda**, con el botón ?).', 'Pulsa **Ver manual (PDF)**. El manual se abre **dentro de la propia aplicación**, en una ventana que ocupa la pantalla.', 'Desplázate por las páginas para leerlo. Arriba tienes **Guardar / descargar** (para quedarte con una copia) y **Cerrar** (para volver exactamente donde estabas).', 'En iPad e iPhone, **Guardar / descargar** abre la hoja de **Compartir** del sistema: elige **Guardar en Archivos**, enviarlo por correo, etc.'],
         imagen: fig('c12_visor_manual.png', 'El manual abierto dentro de la aplicación, con los botones Guardar / descargar y Cerrar.'),
         aviso: { titulo: 'Si el botón dice «El manual estará disponible en breve»', lineas: ['Significa que el PDF aún no está publicado. Vuelve a probar más tarde.'] } },
-      { h: 'Versión instalada y «Buscar actualizaciones»', parrafos: ['En la **Ayuda**, en el apartado «Avisos de cambios», figura la **versión instalada** (ahora **v1.8**) junto al botón **Buscar actualizaciones**. Púlsalo para comprobar **en ese momento** si hay una versión nueva, sin esperar al aviso automático.',
+      { h: 'Versión instalada y «Buscar actualizaciones»', parrafos: ['En la **Ayuda**, en el apartado «Avisos de cambios», figura la **versión instalada** (ahora **v2.0**) junto al botón **Buscar actualizaciones**. Púlsalo para comprobar **en ese momento** si hay una versión nueva, sin esperar al aviso automático.',
         'Si no la hay, aparece **«Tienes la última versión (v1.8)»**. Si la hay, sale arriba el aviso de siempre con el botón **Actualizar**; púlsalo y la aplicación se recarga con lo último. Si no hay conexión, avisa de que no se ha podido comprobar y puedes intentarlo más tarde.',
         'Aunque no pulses nada, la aplicación ya mira sola cada minuto y al volver a la pestaña. El botón sirve para salir de dudas al instante.'],
         imagen: fig('c11_buscar_version.png', 'La versión instalada y el botón Buscar actualizaciones, con el resultado debajo.', 460),
