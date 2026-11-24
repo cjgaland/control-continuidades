@@ -584,7 +584,29 @@
         "ausencia": null,
         "abonado": false
       }
+    },
+    "2026-12": {
+      "rafa": {
+        "dias": [
+          1,
+          8,
+          29,
+          31
+        ],
+        "ausencia": null,
+        "abonado": false
+      },
+      "carlos": {
+        "dias": [
+          8,
+          15,
+          22,
+          29
+        ],
+        "ausencia": null,
+        "abonado": false
+      }
     }
   },
-  "actualizado": "2026-11-03"
+  "actualizado": "2026-11-24"
 }
